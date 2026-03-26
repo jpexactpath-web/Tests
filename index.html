@@ -3,32 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade 4 Test Center</title>
+    <title>Grade 4 Testing Portal</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f7ff; color: #333; text-align: center; padding: 20px; }
-        h1 { color: #2c3e50; margin-bottom: 30px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { border-bottom: 2px solid #3498db; padding-bottom: 10px; color: #3498db; }
-        ul { list-style: none; padding: 0; }
-        li { margin: 15px 0; }
-        a { text-decoration: none; color: white; background-color: #3498db; padding: 12px 25px; border-radius: 8px; display: inline-block; font-weight: bold; transition: background 0.3s; width: 80%; }
-        a:hover { background-color: #2980b9; }
-        .official-btn { background-color: #27ae60; }
-        .official-btn:hover { background-color: #219150; }
-        .note { font-size: 0.9em; color: #7f8c8d; margin-top: 20px; }
+        body { font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; background-color: #eef2f3; text-align: center; padding: 40px; }
+        .box { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; }
+        .btn { display: block; margin: 20px 0; padding: 15px; text-decoration: none; color: white; border-radius: 12px; font-weight: bold; font-size: 1.2rem; transition: transform 0.2s; }
+        .btn:hover { transform: scale(1.03); }
+        .mock { background-color: #3498db; }
+        .official { background-color: #2ecc71; }
+        p { color: #7f8c8d; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-     
-        <h2> Official Tests</h2>
-        <ul>
-            <li><a class="official-btn" href="Grade4_Assessment1_MOCK_Test.html">Mock Test</a></li>
-            <li><a class="official-btn" href="Grade4_Assessment1_OFFICIAL_Test.html">Assessent 1 Test</a></li>
-        </ul>
+    <div class="box">
+        <h1>Grade 4 Test Center</h1>
+        <p>Choose your test below:</p>
 
-        <p class="note">Good luck with your studies!</p>
+        <a href="Grade4_Assessment1_MOCK_Test.html" class="btn mock">
+             Start Mock Test
+        </a>
+
+        <a href="Grade4_Assessment1_OFFICIAL_Test.html" class="btn official">
+             Start Official Test
+        </a>
+
+        <p style="margin-top: 30px;">Good luck!</p>
     </div>
 
 </body>
