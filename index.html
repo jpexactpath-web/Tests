@@ -1,36 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade 4 Testing Portal</title>
-    <style>
-        body { font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; background-color: #eef2f3; text-align: center; padding: 40px; }
-        .box { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; }
-        .btn { display: block; margin: 20px 0; padding: 15px; text-decoration: none; color: white; border-radius: 12px; font-weight: bold; font-size: 1.2rem; transition: transform 0.2s; }
-        .btn:hover { transform: scale(1.03); }
-        .mock { background-color: #3498db; }
-        .official { background-color: #2ecc71; }
-        p { color: #7f8c8d; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade 4 Testing Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f4f6fa;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .portal {
+      max-width: 680px;
+      width: 100%;
+    }
+
+    /* ── Header ── */
+    .portal-header {
+      background: linear-gradient(135deg, #0f2744 0%, #1a4a8a 100%);
+      border-radius: 20px 20px 0 0;
+      padding: 36px 40px 32px;
+      text-align: center;
+      color: white;
+    }
+
+    .portal-header .label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      margin-bottom: 10px;
+    }
+
+    .portal-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .portal-header p {
+      font-size: .9rem;
+      color: rgba(255,255,255,.65);
+    }
+
+    /* ── Body ── */
+    .portal-body {
+      background: white;
+      border-radius: 0 0 20px 20px;
+      padding: 36px 40px 40px;
+      box-shadow: 0 12px 40px rgba(15,39,68,.12);
+    }
+
+    /* ── Assessment block ── */
+    .assessment-block {
+      margin-bottom: 32px;
+    }
+
+    .assessment-block:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .block-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .block-title h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: #0f2744;
+    }
+
+    .block-title .week-tag {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      background: #edf2f8;
+      color: #546e8a;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .block-desc {
+      font-size: .83rem;
+      color: #546e8a;
+      margin-bottom: 14px;
+      line-height: 1.6;
+      padding-left: 2px;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 16px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: .92rem;
+      line-height: 1.3;
+      text-align: center;
+      transition: transform .15s, box-shadow .15s;
+      border: 2px solid transparent;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.12);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn .btn-type {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      opacity: .8;
+    }
+
+    /* Mock style */
+    .btn-mock {
+      background: #e8f3ff;
+      color: #1a4a8a;
+      border-color: #c0d8f5;
+    }
+
+    .btn-mock:hover {
+      background: #d4e8ff;
+      border-color: #1a4a8a;
+    }
+
+    /* Official style */
+    .btn-official {
+      background: #0f2744;
+      color: white;
+    }
+
+    .btn-official:hover {
+      background: #1a4a8a;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: #edf2f8;
+      margin: 28px 0;
+    }
+
+    /* ── Footer ── */
+    .portal-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: .78rem;
+      color: #a0aec0;
+      line-height: 1.6;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .portal-header  { padding: 28px 24px; }
+      .portal-body    { padding: 28px 24px 32px; }
+      .btn-row        { grid-template-columns: 1fr; }
+      .portal-header h1 { font-size: 1.6rem; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="box">
-        <h1>Grade 4 Test Center</h1>
-        <p>Choose your test below:</p>
+  <div class="portal">
 
-        <a href="Grade4_Assessment1_MOCK_Test.html" class="btn mock">
-             Start Mock Test
-        </a>
-
-        <a href="Grade4_Assessment1_OFFICIAL_Test.html" class="btn official">
-             Start Official Test
-        </a>
-
-        <p style="margin-top: 30px;">Good luck!</p>
+    <div class="portal-header">
+      <div class="label">Exact Path Program</div>
+      <h1>Grade 4 Test Center</h1>
+      <p>Select your assessment below. Read the instructions on the test cover page carefully before beginning.</p>
     </div>
+
+    <div class="portal-body">
+
+      <!-- ── Assessment 1: Reading & Speaking ── -->
+      <div class="assessment-block">
+        <div class="block-title">
+          <h2>Assessment 1 &mdash; Reading and Speaking</h2>
+          <span class="week-tag">Weeks 1&ndash;11</span>
+        </div>
+        <p class="block-desc">
+          Covers reading foundations, textual evidence, inferences, character, setting, plot, summarizing literature, and speaking and listening skills.
+          28 multiple-choice questions + 1 oral response task &mdash; 60 minutes.
+        </p>
+        <div class="btn-row">
+          <a href="Grade4_Assessment1_MOCK_Test.html" class="btn btn-mock">
+            <span class="btn-type">Mock Test</span>
+            Reading and Speaking
+          </a>
+          <a href="Grade4_Assessment1_OFFICIAL_Test.html" class="btn btn-official">
+            <span class="btn-type">Official Test</span>
+            Reading and Speaking
+          </a>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ── Assessment 1: Language & Writing ── -->
+      <div class="assessment-block">
+        <div class="block-title">
+          <h2>Assessment 1 &mdash; Language and Writing</h2>
+          <span class="week-tag">Weeks 1&ndash;11</span>
+        </div>
+        <p class="block-desc">
+          Covers verb tenses, progressive tenses, modal auxiliaries, adjective order, capitalization, punctuation, fragments and run-ons, conjunctions, task and purpose, introductions and conclusions, and organizing ideas.
+          26 multiple-choice questions + 3 written response tasks &mdash; 60 minutes.
+        </p>
+        <div class="btn-row">
+          <a href="Grade4_LangWriting_Assessment1_MOCK.html" class="btn btn-mock">
+            <span class="btn-type">Mock Test</span>
+            Language and Writing
+          </a>
+          <a href="Grade4_LangWriting_Assessment1_OFFICIAL.html" class="btn btn-official">
+            <span class="btn-type">Official Test</span>
+            Language and Writing
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /portal-body -->
+
+    <p class="portal-footer">
+      Grade 4 &mdash; Exact Path Program &mdash; Assessment 1<br>
+      All files must be in the same folder for the links to work correctly.
+    </p>
+
+  </div><!-- /portal -->
 
 </body>
 </html>
