@@ -877,6 +877,125 @@ async function sendToFormspree(scoreData){
   }
 }
 
+function submitTest(){
+  clearInterval(timerInterval);
+
+  const allQ = SECTIONS.flatMap(s => s.questions || []);
+  let correct = 0;
+  allQ.forEach(q => { if(answers[q.id] === q.ans) correct++; });
+  const total = allQ.length;
+  const pct   = Math.round(correct / total * 100);
+
+  const domains = {};
+  allQ.forEach(q => {
+    if(!domains[q.domain]) domains[q.domain] = {correct:0, total:0};
+    domains[q.domain].total++;
+    if(answers[q.id] === q.ans) domains[q.domain].correct++;
+  });
+
+  // Switch screens
+  document.getElementById('test').classList.remove('active');
+  document.getElementById('results').classList.add('active');
+
+  const name    = document.getElementById('student-name').value;
+  const teacher = document.getElementById('teacher-name').value || 'Not specified';
+  const date    = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+
+  document.getElementById('student-display').textContent =
+    name + (teacher !== 'Not specified' ? ' — Teacher: ' + teacher : '');
+  document.getElementById('score-pct').textContent  = pct + '%';
+  document.getElementById('score-raw').textContent  = correct + ' / ' + total + ' MCQ';
+
+  setTimeout(() => {
+    const offset = 427 - (427 * (pct / 100));
+    document.getElementById('score-arc').style.strokeDashoffset = offset;
+  }, 300);
+
+  // Domain breakdown bars
+  const dWrap = document.getElementById('domain-breakdown');
+  dWrap.innerHTML = '';
+  Object.entries(domains).forEach(([dom, data]) => {
+    const dpct = Math.round(data.correct / data.total * 100);
+    dWrap.innerHTML += `<div class="domain-row">
+      <div class="domain-label">${dom}</div>
+      <div class="domain-bar-wrap"><div class="domain-bar" style="width:0%" data-w="${dpct}%"></div></div>
+      <div class="domain-score">${data.correct}/${data.total}</div>
+    </div>`;
+  });
+  setTimeout(() => {
+    document.querySelectorAll('.domain-bar').forEach(b => b.style.width = b.dataset.w);
+  }, 500);
+
+  // MCQ answer review
+  const revWrap = document.getElementById('answer-review');
+  revWrap.innerHTML = '';
+  let qn = 0;
+  SECTIONS.forEach(sec => {
+    if(sec.questions && sec.questions.length) {
+      const lbl = document.createElement('p');
+      lbl.style.cssText = 'font-weight:700;font-size:.82rem;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px';
+      lbl.textContent = sec.title;
+      revWrap.appendChild(lbl);
+      sec.questions.forEach(q => {
+        qn++;
+        const ok = answers[q.id] === q.ans;
+        const r  = document.createElement('div');
+        r.className = 'rev-item ' + (ok ? 'ok' : 'no');
+        r.innerHTML = `<div class="rev-icon">${ok ? '[Correct]' : '[Wrong]'}</div>
+          <div>
+            <div class="rev-q">Q${qn}. ${q.text.split('\n')[0]}</div>
+            <div class="rev-ans">${ok
+              ? 'Correct: ' + q.opts[q.ans]
+              : 'Your answer: ' + (answers[q.id] !== undefined ? q.opts[answers[q.id]] : 'Not answered') + ' — Correct: ' + q.opts[q.ans]
+            }</div>
+          </div>`;
+        revWrap.appendChild(r);
+      });
+    }
+  });
+
+  // Written response review
+  const wrWrap = document.getElementById('written-review');
+  wrWrap.innerHTML = '';
+  WRITTEN_QS.forEach(wq => {
+    const response = (writtenAnswers[wq.id] || '').trim();
+    const block = document.createElement('div');
+    block.className = 'wr-review-block';
+    block.innerHTML = `<h5>${wq.title} (${wq.points} points — Teacher scored)</h5>
+      <p style="font-size:.82rem;color:var(--mid);margin-bottom:6px">Your response:</p>
+      <div class="student-response">${response || 'No response submitted.'}</div>
+      <div class="model-answer">
+        <strong>Model Answer (for teacher reference):</strong>
+        ${(wq.modelAnswer||'').replace(/\n/g,'<br>')}
+      </div>
+      <table class="rubric-table" style="margin-top:14px">
+        <thead><tr><th>Criterion</th><th>Points</th><th>Description</th></tr></thead>
+        <tbody>${wq.rubric.map(r=>`<tr><td>${r.criterion}</td><td><span class="pts-pill">${r.pts}</span></td><td>${r.desc}</td></tr>`).join('')}</tbody>
+      </table>`;
+    wrWrap.appendChild(block);
+  });
+
+  // Build score breakdown text
+  let breakdown_txt = '';
+  Object.entries(domains).forEach(([d,v]) => { breakdown_txt += d + ': ' + v.correct + '/' + v.total + '\n'; });
+
+  // Auto-submit to Formspree (includes all written responses)
+  sendToFormspree({
+    _subject:          '[Mock] Grade 4 Language and Writing — ' + name + ' — ' + correct + '/' + total + ' (' + pct + '%)',
+    test_type:         'MOCK TEST',
+    student_name:      name,
+    teacher:           teacher,
+    test_date:         date,
+    mcq_score:         correct + ' / ' + total + ' (' + pct + '%)',
+    score_breakdown:   breakdown_txt,
+    written_response_1: writtenAnswers['wq1'] || 'No response submitted',
+    written_response_2: writtenAnswers['wq2'] || 'No response submitted',
+    written_response_3: writtenAnswers['wq3'] || 'No response submitted'
+  });
+
+  window.scrollTo(0, 0);
+}
+
 // ============================================================
 // DELIVERY
 // ============================================================
