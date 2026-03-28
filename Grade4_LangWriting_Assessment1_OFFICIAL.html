@@ -200,13 +200,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
   body{background:white}
   .q-card,.wr-card,.res-section,.sec-hd{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
 }
-/* ── Submission banner ── */
 .submit-banner{
   border-radius:12px;padding:16px 20px;margin-bottom:20px;
   font-size:.9rem;line-height:1.6;border:2px solid;
   transition:all .3s;
 }
-/* ── Cover warning ── */
 .endpoint-warning{
   display:none;background:#fff3cd;border:2px solid #f5d78e;
   border-radius:10px;padding:14px 16px;margin-bottom:20px;
@@ -214,7 +212,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
 }
 .endpoint-warning strong{display:block;margin-bottom:4px}
 .endpoint-warning code{background:#fdecc8;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:.82rem}
-
 </style>
 </head>
 <body>
@@ -243,7 +240,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
     </div>
     <div class="field-group">
       <label>Date (auto-filled)</label>
-      <input type="date" id="test-date" readonly style="background:#f4f6fa;cursor:default;color:var(--mid)">
+      <input type="text" id="test-date" readonly style="background:#f4f6fa;cursor:default;color:var(--mid)">
     </div>
     <div class="field-group">
       <label>Teacher</label>
@@ -256,14 +253,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
         <li>This is an official assessment. No answer feedback will be given during the test.</li>
         <li>Read every question carefully before selecting your answer.</li>
         <li>You may navigate between sections at any time before submitting.</li>
-        <li>The test will submit automatically when the 60-minute timer reaches zero.</li>
+        <li>The test will submit automatically when the 90-minute timer reaches zero.</li>
         <li>Write your responses in full sentences using correct grammar and punctuation.</li>
         <li>Do not refresh the page or close the browser during the test.</li>
       </ul>
     </div>
-    <div class="checkbox-row">
-      <input type="checkbox" id="agree-check" onchange="checkAgreement()">
-      <label for="agree-check">I have read the rules and I am ready to begin the official test.</label>
+    <div class="checkbox-row" onclick="document.getElementById('agree-check').click();">
+      <input type="checkbox" id="agree-check" onclick="event.stopPropagation(); checkAgreement();">
+      <label for="agree-check" onclick="event.stopPropagation();">I have read the rules and I am ready to begin the official test.</label>
     </div>
     <button class="btn-primary" id="btn-start" onclick="startTest()" disabled>Begin Official Test</button>
   </div>
@@ -346,7 +343,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
     </div>
     <div class="res-section">
       <h3>Written Response Scoring</h3>
-      <p style="font-size:.87rem;color:var(--mid);margin-bottom:16px;line-height:1.6">Read each student response and enter scores in the fields below. Total written score: 12 points.</p>
+      <p style="font-size:.87rem;color:var(--mid);margin-bottom:16px;line-height:1.6">Read each student response and enter scores in the fields below. Total written score: 18 points.</p>
       <div id="written-scoring"></div>
       <div style="text-align:right;margin-top:12px">
         <p style="font-size:.85rem;color:var(--mid);margin-bottom:4px">Written Total</p>
@@ -357,7 +354,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
       <h3>Combined Score</h3>
       <p style="font-size:.85rem;color:var(--mid);margin-bottom:12px">MCQ (52 pts) + Written (18 pts) = 70 pts total</p>
       <div class="combined-box">
-        <div class="c-num" id="combined-display">-- / 44</div>
+        <div class="c-num" id="combined-display">-- / 70</div>
       </div>
       <div style="margin-top:16px">
         <label style="display:block;font-weight:700;font-size:.85rem;margin-bottom:8px;color:var(--navy)">Teacher Comments</label>
@@ -376,10 +373,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
 
 <script>
 // ============================================================
-// FORMSPREE — endpoint hardcoded (no configuration needed)
+// FORMSPREE
 // ============================================================
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mdapkdel';
 function getFsEndpoint(){ return FORMSPREE_ENDPOINT; }
+
+// ============================================================
+// AUTO-FILL DATE ON LOAD
+// ============================================================
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('test-date').value = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+});
 
 // ============================================================
 // QUESTION DATA
@@ -391,169 +395,39 @@ const SECTIONS = [
     ccss:'L.4.1 - L.4.1b - L.4.1c - L.4.1d - L.4.1f - L.4.2a - L.4.2b - L.4.2c',
     desc:'Grammar, punctuation, and language conventions covered in Weeks 1-11',
     questions:[
-      {id:'q1',num:1,
-       text:'Which sentence uses the PRESENT tense correctly?',
-       opts:['The river flows swiftly through the valley.','The river flowed swiftly through the valley yesterday.','The river is flow swiftly through the valley.','The river will flowing swiftly through the valley.'],
-       ans:0,ccss:'L.4.1',domain:'Verb Tenses',
-       feedback:'"Flows" is the simple present tense used to describe a regular or ongoing state.'},
-      {id:'q2',num:2,
-       text:'Which sentence correctly uses the PAST PERFECT tense?',
-       opts:['She will have finished her project by tomorrow.','She has finished her project already.','She had finished her project before the bell rang.','She finishes her project every week.'],
-       ans:2,ccss:'L.4.1',domain:'Verb Tenses',
-       feedback:'The past perfect "had finished" describes an action completed before another past event. "Before the bell rang" confirms the sequence.'},
-      {id:'q3',num:3,
-       text:'Which sentence uses the FUTURE PROGRESSIVE correctly?',
-       opts:['The choir will be performing at the assembly next week.','The choir performed at the assembly last week.','The choir is performing at the assembly right now.','The choir performed at the assembly every year.'],
-       ans:0,ccss:'L.4.1b',domain:'Progressive Tenses',
-       feedback:'The future progressive "will be performing" describes an action that will be in progress at a future point in time.'},
-      {id:'q4',num:4,
-       text:'Which sentence uses the PAST PROGRESSIVE tense correctly?',
-       opts:['The mechanics fixed the car engine all day long.','The mechanics were fixing the car engine when we arrived.','The mechanics will fix the car engine tomorrow.','The mechanics has fixed the car engine already.'],
-       ans:1,ccss:'L.4.1b',domain:'Progressive Tenses',
-       feedback:'The past progressive "were fixing" describes an action that was in progress when another event (we arrived) occurred.'},
-      {id:'q5',num:5,
-       text:'Which modal auxiliary best expresses ABILITY in this sentence?\n"With enough practice, she ___ speak fluently in six months."',
-       opts:['must','should','could','might'],
-       ans:2,ccss:'L.4.1c',domain:'Modal Auxiliaries',
-       feedback:'"Could" expresses ability or potential. In this context, it refers to a skill she will be capable of developing.'},
-      {id:'q6',num:6,
-       text:'Which sentence uses a modal auxiliary to express OBLIGATION?',
-       opts:['He might visit his grandparents this weekend.','She should submit her report before the deadline.','They could try a different approach to the problem.','We may receive our results by Friday.'],
-       ans:1,ccss:'L.4.1c',domain:'Modal Auxiliaries',
-       feedback:'"Should" expresses duty or strong recommendation, making it the closest to obligation. "Might" and "may" express possibility; "could" expresses ability.'},
-      {id:'q7',num:7,
-       text:'Which phrase lists adjectives in the CORRECT order?',
-       opts:['a round large ancient coin','a large ancient round coin','a large round ancient coin','an ancient large round coin'],
-       ans:2,ccss:'L.4.1d',domain:'Adjective Order',
-       feedback:'The correct adjective order is size (large) - shape (round) - age (ancient). The standard sequence: opinion - size - age - shape - colour - origin - material.'},
-      {id:'q8',num:8,
-       text:'Which sentence uses adjectives in the CORRECT order?',
-       opts:['He drove an Italian red old sports car.','He drove an old red Italian sports car.','He drove a red old Italian sports car.','He drove an old Italian red sports car.'],
-       ans:1,ccss:'L.4.1d',domain:'Adjective Order',
-       feedback:'The correct order is age (old) - colour (red) - origin (Italian). Following the standard pattern: age before colour before origin.'},
-      {id:'q9',num:9,
-       text:'Which sentence is capitalized CORRECTLY?',
-       opts:['The Amazon river flows through brazil and several other countries.','The amazon River flows through Brazil and several other countries.','The Amazon River flows through Brazil and several other countries.','the Amazon River flows through Brazil and Several other Countries.'],
-       ans:2,ccss:'L.4.2a',domain:'Capitalization',
-       feedback:'Both parts of the proper noun "Amazon River" are capitalized, as is the country name "Brazil." Common words like "several" and "other" are not capitalized mid-sentence.'},
-      {id:'q10',num:10,
-       text:'Which sentence contains a capitalization ERROR?',
-       opts:['We celebrated Thanksgiving at my aunt\'s house in Boston.','The science fair will be held on the third friday of October.','President Lincoln signed the Emancipation Proclamation in 1863.','My cousin attends Riverside Middle School in Portland.'],
-       ans:1,ccss:'L.4.2a',domain:'Capitalization',
-       feedback:'"Friday" is a day of the week and must always be capitalized. Days of the week and months are proper nouns.'},
-      {id:'q11',num:11,
-       text:'Which sentence uses quotation marks CORRECTLY?',
-       opts:['"Please turn to page forty-five, the teacher instructed."','The teacher instructed, "please turn to page forty-five."','The teacher instructed, "Please turn to page forty-five."','The teacher "instructed," Please turn to page forty-five.'],
-       ans:2,ccss:'L.4.2b',domain:'Punctuation - Dialogue',
-       feedback:'A comma separates the dialogue tag from the quotation. The first word inside the quotation marks is capitalized.'},
-      {id:'q12',num:12,
-       text:'Which sentence punctuates the dialogue CORRECTLY?',
-       opts:['"We are going to be late" Maya whispered urgently.','"We are going to be late," Maya whispered urgently.','"We are going to be late", Maya whispered urgently.','"We are going to be late." Maya whispered urgently.'],
-       ans:1,ccss:'L.4.2b',domain:'Punctuation - Dialogue',
-       feedback:'The comma goes inside the closing quotation mark when the dialogue tag follows. "Maya whispered urgently" is the tag, not a new sentence.'},
-      {id:'q13',num:13,
-       text:'Which of the following is a complete sentence, NOT a fragment?',
-       opts:['After hiking through the dense rainforest for several hours.','The ancient ruins discovered by the archaeologists last spring.','Despite the heavy rain and the flooded roads.','The expedition team finally reached the summit at noon.'],
-       ans:3,ccss:'L.4.1f',domain:'Fragments and Run-Ons',
-       feedback:'Option D has a subject (expedition team) and a predicate (finally reached the summit at noon). Options A, B, and C lack a complete predicate and cannot stand alone.'},
-      {id:'q14',num:14,
-       text:'Which option CORRECTLY fixes this run-on sentence?\n"The concert was sold out we could not get tickets we decided to watch it online"',
-       opts:['The concert was sold out, we could not get tickets, we decided to watch it online.','The concert was sold out. We could not get tickets, so we decided to watch it online.','The concert was sold out we could not get tickets, so we decided to watch it online.','The concert was sold out, we could not get tickets. So we decided to watch it online.'],
-       ans:1,ccss:'L.4.1f',domain:'Fragments and Run-Ons',
-       feedback:'Option B correctly separates the first independent clause with a period, then joins the remaining two with a comma and a coordinating conjunction.'},
-      {id:'q15',num:15,
-       text:'Which sentence correctly uses a comma and a coordinating conjunction to join two independent clauses?',
-       opts:['The experiment failed and the scientists, tried again.','The experiment failed, and the scientists tried again.','The experiment failed, and, the scientists tried again.','The experiment failed and, the scientists tried again.'],
-       ans:1,ccss:'L.4.2c',domain:'Conjunctions',
-       feedback:'The comma is placed before the coordinating conjunction "and" when joining two independent clauses. Only one comma is used.'},
-      {id:'q16',num:16,
-       text:'Which coordinating conjunction best completes this sentence?\n"He trained for months, ___ he won first place in the competition."',
-       opts:['but','for','yet','so'],
-       ans:3,ccss:'L.4.2c',domain:'Conjunctions',
-       feedback:'"So" shows a result or consequence. He trained hard; as a result, he won. "But" and "yet" would introduce contrast, which does not fit the meaning here.'},
-
-      {id:'q27',num:27,
-       text:'Which sentence uses the PAST PERFECT tense correctly?',
-       opts:['She has eaten dinner before the guests arrived.','She had eaten dinner before the guests arrived.','She was eating dinner when the guests arrived.','She ate dinner while the guests arrived.'],
-       ans:1,ccss:'L.4.1',domain:'Verb Tenses',
-       feedback:'The past perfect "had eaten" is used for an action completed before another past action. "Before the guests arrived" confirms the sequence.'},
-      {id:'q28',num:28,
-       text:'Which sentence correctly uses the SIMPLE FUTURE tense?',
-       opts:['By tomorrow, she completed the project.','She is completing the project right now.','She will complete the project by tomorrow.','She had completed the project already.'],
-       ans:2,ccss:'L.4.1',domain:'Verb Tenses',
-       feedback:'"Will complete" is the simple future tense, expressing an action that has not yet happened.'},
-      {id:'q29',num:29,
-       text:'Which sentence uses the PRESENT PERFECT tense?',
-       opts:['The scientists discovered a new planet last year.','The scientists are discovering a new planet.','The scientists have discovered a new planet.','The scientists will discover a new planet.'],
-       ans:2,ccss:'L.4.1',domain:'Verb Tenses',
-       feedback:'"Have discovered" is the present perfect, connecting a past action to the present. It suggests the discovery is recent or still relevant.'},
-      {id:'q30',num:30,
-       text:'Which sentence uses the FUTURE PROGRESSIVE tense correctly?',
-       opts:['They performed at the concert last Friday.','They are performing at the concert right now.','They were performing at the concert when the lights went out.','They will be performing at the concert all evening.'],
-       ans:3,ccss:'L.4.1b',domain:'Progressive Tenses',
-       feedback:'"Will be performing" is the future progressive, describing an action that will be in progress at a future point in time.'},
-      {id:'q31',num:31,
-       text:'Which sentence correctly uses the PAST PROGRESSIVE tense?',
-       opts:['The children played in the garden all afternoon.','The children are playing in the garden now.','The children were playing in the garden when it started to rain.','The children had played in the garden before dinner.'],
-       ans:2,ccss:'L.4.1b',domain:'Progressive Tenses',
-       feedback:'"Were playing" is the past progressive, showing an ongoing action that was interrupted by another event — the rain starting.'},
-      {id:'q32',num:32,
-       text:'Which sentence uses the modal auxiliary "might" to express POSSIBILITY?',
-       opts:['You must submit the form before the deadline.','She might attend the event if she finishes early.','He can speak four languages fluently.','They should exercise more regularly.'],
-       ans:1,ccss:'L.4.1c',domain:'Modal Auxiliaries',
-       feedback:'"Might" expresses possibility — something that may or may not happen. "Must" = obligation, "can" = ability, "should" = advice.'},
-      {id:'q33',num:33,
-       text:'Which sentence uses a modal auxiliary to express ADVICE?',
-       opts:['You must wear a seatbelt by law.','She can run faster than anyone on the team.','He should revise his essay before submitting it.','They will travel to Spain next summer.'],
-       ans:2,ccss:'L.4.1c',domain:'Modal Auxiliaries',
-       feedback:'"Should" expresses advice or recommendation — it is the appropriate modal for suggesting what someone ought to do.'},
-      {id:'q34',num:34,
-       text:'Which sentence uses adjectives in the CORRECT order?',
-       opts:['She carried a leather old small briefcase.','She carried a small leather old briefcase.','She carried a small old leather briefcase.','She carried an old small leather briefcase.'],
-       ans:2,ccss:'L.4.1d',domain:'Adjective Order',
-       feedback:'The correct order is size (small) before age (old) before material (leather). Standard English adjective order: opinion-size-age-shape-colour-origin-material.'},
-      {id:'q35',num:35,
-       text:'Which sentence places adjectives in the INCORRECT order?',
-       opts:['He wore a long warm woollen scarf.','She bought a round wooden antique clock.','They found a tiny ancient Egyptian artefact.','He drove a red fast expensive Italian sports car.'],
-       ans:3,ccss:'L.4.1d',domain:'Adjective Order',
-       feedback:'Option D places colour (red) before size/opinion (fast, expensive) which violates conventional order. Correct: "a fast, expensive red Italian sports car."'},
-      {id:'q36',num:36,
-       text:'Which sentence contains a capitalization ERROR?',
-       opts:['My family celebrates Diwali every October in our home city of Mumbai.','The Nile River flows through egypt and several other African countries.','President Roosevelt signed the legislation in the West Wing of the White House.','My grandmother was born on Christmas Day in a small town in Ireland.'],
-       ans:1,ccss:'L.4.2a',domain:'Capitalization',
-       feedback:'"Egypt" is the name of a country and must always be capitalized. Country names are proper nouns regardless of where they appear in a sentence.'},
-      {id:'q37',num:37,
-       text:'Which sentence is capitalized CORRECTLY?',
-       opts:['the amazon river flows through brazil, peru, and colombia.','The Amazon River flows through Brazil, Peru, and Colombia.','The amazon River flows through brazil, peru, and colombia.','the Amazon river flows Through Brazil, Peru, and Colombia.'],
-       ans:1,ccss:'L.4.2a',domain:'Capitalization',
-       feedback:'The Amazon River is a proper noun — both words are capitalized. Country names Brazil, Peru, and Colombia are also proper nouns and must be capitalized.'},
-      {id:'q38',num:38,
-       text:'Which sentence correctly uses quotation marks for DIALOGUE?',
-       opts:['"Let's begin the experiment", Dr. Chen said.','Dr. Chen said, "Let's begin the experiment."','"Let's begin the experiment." Dr. Chen said,','Dr. Chen said "Let's begin the experiment,"'],
-       ans:1,ccss:'L.4.2b',domain:'Punctuation - Dialogue',
-       feedback:'The dialogue tag comes first, followed by a comma, then the quoted speech in quotation marks. The period goes inside the closing quotation mark.'},
-      {id:'q39',num:39,
-       text:'Which sentence correctly punctuates a SPLIT DIALOGUE tag?',
-       opts:['"I think," said Leo, "we should leave now."','"I think" said Leo "we should leave now."','"I think," said Leo "we should leave now."','"I think" said Leo, "we should leave now."'],
-       ans:0,ccss:'L.4.2b',domain:'Punctuation - Dialogue',
-       feedback:'In a split dialogue tag, commas go inside both sets of quotation marks to separate the tag from the quoted speech on each side.'},
-      {id:'q40',num:40,
-       text:'Which option CORRECTLY fixes this fragment?
-"Running through the corridors of the old school building at midnight."',
-       opts:['Running through the corridors of the old school building at midnight, was terrifying.','The students were running through the corridors of the old school building at midnight.','Running. Through the corridors. Of the old school building. At midnight.','Running through the corridors, of the old school building at midnight.'],
-       ans:1,ccss:'L.4.1f',domain:'Fragments and Run-Ons',
-       feedback:'Option B adds a subject (the students) and a complete verb phrase (were running), turning the fragment into a proper sentence.'},
-      {id:'q41',num:41,
-       text:'Which option CORRECTLY fixes this run-on sentence?
-"The storm knocked out the electricity the whole town was in darkness people were frightened."',
-       opts:['The storm knocked out the electricity. The whole town was in darkness, and people were frightened.','The storm, knocked out the electricity, the whole town was in darkness, people were frightened.','The storm knocked out the electricity; but the whole town was in darkness, people were frightened.','The storm knocked out the electricity the whole town was in darkness. People were frightened.'],
-       ans:0,ccss:'L.4.1f',domain:'Fragments and Run-Ons',
-       feedback:'Option A correctly separates the first independent clause with a period, then joins the remaining two with a comma and "and."'},
-      {id:'q42',num:42,
-       text:'Which sentence INCORRECTLY uses a coordinating conjunction?',
-       opts:['She studied hard, so she passed the exam easily.','He wanted to go for a walk, but the weather was terrible.','They arrived late, yet they still managed to find good seats.','I enjoy reading novels, and, I also like watching films.'],
-       ans:3,ccss:'L.4.2c',domain:'Conjunctions',
-       feedback:'Option D incorrectly places a comma on both sides of "and." When joining two independent clauses, only one comma is used — before the coordinating conjunction, not after it.'},    ]
+      {id:'q1',num:1,text:'Which sentence uses the PRESENT tense correctly?',opts:['The river flows swiftly through the valley.','The river flowed swiftly through the valley yesterday.','The river is flow swiftly through the valley.','The river will flowing swiftly through the valley.'],ans:0,ccss:'L.4.1',domain:'Verb Tenses',feedback:'"Flows" is the simple present tense used to describe a regular or ongoing state.'},
+      {id:'q2',num:2,text:'Which sentence correctly uses the PAST PERFECT tense?',opts:['She will have finished her project by tomorrow.','She has finished her project already.','She had finished her project before the bell rang.','She finishes her project every week.'],ans:2,ccss:'L.4.1',domain:'Verb Tenses',feedback:'The past perfect "had finished" describes an action completed before another past event.'},
+      {id:'q3',num:3,text:'Which sentence uses the FUTURE PROGRESSIVE correctly?',opts:['The choir will be performing at the assembly next week.','The choir performed at the assembly last week.','The choir is performing at the assembly right now.','The choir performed at the assembly every year.'],ans:0,ccss:'L.4.1b',domain:'Progressive Tenses',feedback:'The future progressive "will be performing" describes an action that will be in progress at a future point in time.'},
+      {id:'q4',num:4,text:'Which sentence uses the PAST PROGRESSIVE tense correctly?',opts:['The mechanics fixed the car engine all day long.','The mechanics were fixing the car engine when we arrived.','The mechanics will fix the car engine tomorrow.','The mechanics has fixed the car engine already.'],ans:1,ccss:'L.4.1b',domain:'Progressive Tenses',feedback:'The past progressive "were fixing" describes an action that was in progress when another event occurred.'},
+      {id:'q5',num:5,text:'Which modal auxiliary best expresses ABILITY in this sentence?\n"With enough practice, she ___ speak fluently in six months."',opts:['must','should','could','might'],ans:2,ccss:'L.4.1c',domain:'Modal Auxiliaries',feedback:'"Could" expresses ability or potential.'},
+      {id:'q6',num:6,text:'Which sentence uses a modal auxiliary to express OBLIGATION?',opts:['He might visit his grandparents this weekend.','She should submit her report before the deadline.','They could try a different approach to the problem.','We may receive our results by Friday.'],ans:1,ccss:'L.4.1c',domain:'Modal Auxiliaries',feedback:'"Should" expresses duty or strong recommendation.'},
+      {id:'q7',num:7,text:'Which phrase lists adjectives in the CORRECT order?',opts:['a round large ancient coin','a large ancient round coin','a large round ancient coin','an ancient large round coin'],ans:2,ccss:'L.4.1d',domain:'Adjective Order',feedback:'The correct adjective order is size (large) - shape (round) - age (ancient).'},
+      {id:'q8',num:8,text:'Which sentence uses adjectives in the CORRECT order?',opts:['He drove an Italian red old sports car.','He drove an old red Italian sports car.','He drove a red old Italian sports car.','He drove an old Italian red sports car.'],ans:1,ccss:'L.4.1d',domain:'Adjective Order',feedback:'The correct order is age (old) - colour (red) - origin (Italian).'},
+      {id:'q9',num:9,text:'Which sentence is capitalized CORRECTLY?',opts:['The Amazon river flows through brazil and several other countries.','The amazon River flows through Brazil and several other countries.','The Amazon River flows through Brazil and several other countries.','the Amazon River flows through Brazil and Several other Countries.'],ans:2,ccss:'L.4.2a',domain:'Capitalization',feedback:'Both parts of the proper noun "Amazon River" are capitalized, as is the country name "Brazil."'},
+      {id:'q10',num:10,text:'Which sentence contains a capitalization ERROR?',opts:['We celebrated Thanksgiving at my aunt\'s house in Boston.','The science fair will be held on the third friday of October.','President Lincoln signed the Emancipation Proclamation in 1863.','My cousin attends Riverside Middle School in Portland.'],ans:1,ccss:'L.4.2a',domain:'Capitalization',feedback:'"Friday" is a day of the week and must always be capitalized.'},
+      {id:'q11',num:11,text:'Which sentence uses quotation marks CORRECTLY?',opts:['"Please turn to page forty-five, the teacher instructed."','The teacher instructed, "please turn to page forty-five."','The teacher instructed, "Please turn to page forty-five."','The teacher "instructed," Please turn to page forty-five.'],ans:2,ccss:'L.4.2b',domain:'Punctuation - Dialogue',feedback:'A comma separates the dialogue tag from the quotation. The first word inside the quotation marks is capitalized.'},
+      {id:'q12',num:12,text:'Which sentence punctuates the dialogue CORRECTLY?',opts:['"We are going to be late" Maya whispered urgently.','"We are going to be late," Maya whispered urgently.','"We are going to be late", Maya whispered urgently.','"We are going to be late." Maya whispered urgently.'],ans:1,ccss:'L.4.2b',domain:'Punctuation - Dialogue',feedback:'The comma goes inside the closing quotation mark when the dialogue tag follows.'},
+      {id:'q13',num:13,text:'Which of the following is a complete sentence, NOT a fragment?',opts:['After hiking through the dense rainforest for several hours.','The ancient ruins discovered by the archaeologists last spring.','Despite the heavy rain and the flooded roads.','The expedition team finally reached the summit at noon.'],ans:3,ccss:'L.4.1f',domain:'Fragments and Run-Ons',feedback:'Option D has a subject and a predicate.'},
+      {id:'q14',num:14,text:'Which option CORRECTLY fixes this run-on sentence?\n"The concert was sold out we could not get tickets we decided to watch it online"',opts:['The concert was sold out, we could not get tickets, we decided to watch it online.','The concert was sold out. We could not get tickets, so we decided to watch it online.','The concert was sold out we could not get tickets, so we decided to watch it online.','The concert was sold out, we could not get tickets. So we decided to watch it online.'],ans:1,ccss:'L.4.1f',domain:'Fragments and Run-Ons',feedback:'Option B correctly separates the first independent clause with a period, then joins the remaining two with a comma and a coordinating conjunction.'},
+      {id:'q15',num:15,text:'Which sentence correctly uses a comma and a coordinating conjunction to join two independent clauses?',opts:['The experiment failed and the scientists, tried again.','The experiment failed, and the scientists tried again.','The experiment failed, and, the scientists tried again.','The experiment failed and, the scientists tried again.'],ans:1,ccss:'L.4.2c',domain:'Conjunctions',feedback:'The comma is placed before the coordinating conjunction "and" when joining two independent clauses.'},
+      {id:'q16',num:16,text:'Which coordinating conjunction best completes this sentence?\n"He trained for months, ___ he won first place in the competition."',opts:['but','for','yet','so'],ans:3,ccss:'L.4.2c',domain:'Conjunctions',feedback:'"So" shows a result or consequence.'},
+      {id:'q27',num:27,text:'Which sentence uses the PAST PERFECT tense correctly?',opts:['She has eaten dinner before the guests arrived.','She had eaten dinner before the guests arrived.','She was eating dinner when the guests arrived.','She ate dinner while the guests arrived.'],ans:1,ccss:'L.4.1',domain:'Verb Tenses',feedback:'The past perfect "had eaten" is used for an action completed before another past action.'},
+      {id:'q28',num:28,text:'Which sentence correctly uses the SIMPLE FUTURE tense?',opts:['By tomorrow, she completed the project.','She is completing the project right now.','She will complete the project by tomorrow.','She had completed the project already.'],ans:2,ccss:'L.4.1',domain:'Verb Tenses',feedback:'"Will complete" is the simple future tense.'},
+      {id:'q29',num:29,text:'Which sentence uses the PRESENT PERFECT tense?',opts:['The scientists discovered a new planet last year.','The scientists are discovering a new planet.','The scientists have discovered a new planet.','The scientists will discover a new planet.'],ans:2,ccss:'L.4.1',domain:'Verb Tenses',feedback:'"Have discovered" is the present perfect.'},
+      {id:'q30',num:30,text:'Which sentence uses the FUTURE PROGRESSIVE tense correctly?',opts:['They performed at the concert last Friday.','They are performing at the concert right now.','They were performing at the concert when the lights went out.','They will be performing at the concert all evening.'],ans:3,ccss:'L.4.1b',domain:'Progressive Tenses',feedback:'"Will be performing" is the future progressive.'},
+      {id:'q31',num:31,text:'Which sentence correctly uses the PAST PROGRESSIVE tense?',opts:['The children played in the garden all afternoon.','The children are playing in the garden now.','The children were playing in the garden when it started to rain.','The children had played in the garden before dinner.'],ans:2,ccss:'L.4.1b',domain:'Progressive Tenses',feedback:'"Were playing" is the past progressive.'},
+      {id:'q32',num:32,text:'Which sentence uses the modal auxiliary "might" to express POSSIBILITY?',opts:['You must submit the form before the deadline.','She might attend the event if she finishes early.','He can speak four languages fluently.','They should exercise more regularly.'],ans:1,ccss:'L.4.1c',domain:'Modal Auxiliaries',feedback:'"Might" expresses possibility.'},
+      {id:'q33',num:33,text:'Which sentence uses a modal auxiliary to express ADVICE?',opts:['You must wear a seatbelt by law.','She can run faster than anyone on the team.','He should revise his essay before submitting it.','They will travel to Spain next summer.'],ans:2,ccss:'L.4.1c',domain:'Modal Auxiliaries',feedback:'"Should" expresses advice or recommendation.'},
+      {id:'q34',num:34,text:'Which sentence uses adjectives in the CORRECT order?',opts:['She carried a leather old small briefcase.','She carried a small leather old briefcase.','She carried a small old leather briefcase.','She carried an old small leather briefcase.'],ans:2,ccss:'L.4.1d',domain:'Adjective Order',feedback:'The correct order is size (small) before age (old) before material (leather).'},
+      {id:'q35',num:35,text:'Which sentence places adjectives in the INCORRECT order?',opts:['He wore a long warm woollen scarf.','She bought a round wooden antique clock.','They found a tiny ancient Egyptian artefact.','He drove a red fast expensive Italian sports car.'],ans:3,ccss:'L.4.1d',domain:'Adjective Order',feedback:'Option D places colour before size/opinion which violates conventional order.'},
+      {id:'q36',num:36,text:'Which sentence contains a capitalization ERROR?',opts:['My family celebrates Diwali every October in our home city of Mumbai.','The Nile River flows through egypt and several other African countries.','President Roosevelt signed the legislation in the West Wing of the White House.','My grandmother was born on Christmas Day in a small town in Ireland.'],ans:1,ccss:'L.4.2a',domain:'Capitalization',feedback:'"Egypt" is the name of a country and must always be capitalized.'},
+      {id:'q37',num:37,text:'Which sentence is capitalized CORRECTLY?',opts:['the amazon river flows through brazil, peru, and colombia.','The Amazon River flows through Brazil, Peru, and Colombia.','The amazon River flows through brazil, peru, and colombia.','the Amazon river flows Through Brazil, Peru, and Colombia.'],ans:1,ccss:'L.4.2a',domain:'Capitalization',feedback:'The Amazon River is a proper noun. Country names must be capitalized.'},
+      {id:'q38',num:38,text:'Which sentence correctly uses quotation marks for DIALOGUE?',opts:['"Let\'s begin the experiment", Dr. Chen said.','Dr. Chen said, "Let\'s begin the experiment."','"Let\'s begin the experiment." Dr. Chen said,','Dr. Chen said "Let\'s begin the experiment,"'],ans:1,ccss:'L.4.2b',domain:'Punctuation - Dialogue',feedback:'The dialogue tag comes first, followed by a comma, then the quoted speech in quotation marks.'},
+      {id:'q39',num:39,text:'Which sentence correctly punctuates a SPLIT DIALOGUE tag?',opts:['"I think," said Leo, "we should leave now."','"I think" said Leo "we should leave now."','"I think," said Leo "we should leave now."','"I think" said Leo, "we should leave now."'],ans:0,ccss:'L.4.2b',domain:'Punctuation - Dialogue',feedback:'In a split dialogue tag, commas go inside both sets of quotation marks.'},
+      {id:'q40',num:40,text:'Which option CORRECTLY fixes this fragment?\n"Running through the corridors of the old school building at midnight."',opts:['Running through the corridors of the old school building at midnight, was terrifying.','The students were running through the corridors of the old school building at midnight.','Running. Through the corridors. Of the old school building. At midnight.','Running through the corridors, of the old school building at midnight.'],ans:1,ccss:'L.4.1f',domain:'Fragments and Run-Ons',feedback:'Option B adds a subject and a complete verb phrase.'},
+      {id:'q41',num:41,text:'Which option CORRECTLY fixes this run-on sentence?\n"The storm knocked out the electricity the whole town was in darkness people were frightened."',opts:['The storm knocked out the electricity. The whole town was in darkness, and people were frightened.','The storm, knocked out the electricity, the whole town was in darkness, people were frightened.','The storm knocked out the electricity; but the whole town was in darkness, people were frightened.','The storm knocked out the electricity the whole town was in darkness. People were frightened.'],ans:0,ccss:'L.4.1f',domain:'Fragments and Run-Ons',feedback:'Option A correctly separates the first independent clause with a period, then joins the remaining two with a comma and "and."'},
+      {id:'q42',num:42,text:'Which sentence INCORRECTLY uses a coordinating conjunction?',opts:['She studied hard, so she passed the exam easily.','He wanted to go for a walk, but the weather was terrible.','They arrived late, yet they still managed to find good seats.','I enjoy reading novels, and, I also like watching films.'],ans:3,ccss:'L.4.2c',domain:'Conjunctions',feedback:'Option D incorrectly places a comma on both sides of "and."'},
+    ]
   },
   {
     id:'s2',
@@ -561,118 +435,33 @@ const SECTIONS = [
     ccss:'W.4.4 - W.4.1a - W.4.2a - W.4.1b - W.4.2b',
     desc:'Task, purpose, audience, introductions, conclusions, and organizing ideas - Weeks 1 and 8-11',
     questions:[
-      {id:'q17',num:17,
-       text:'A student is writing a guide explaining how to care for a pet hamster. What is the primary PURPOSE of this writing?',
-       opts:['To entertain readers with a funny story about hamsters','To persuade readers to adopt a hamster as a pet','To inform readers about the steps needed to care for a hamster','To express personal feelings about having a hamster'],
-       ans:2,ccss:'W.4.4',domain:'Task, Purpose, and Audience',
-       feedback:'A how-to guide has an informative purpose. It aims to teach the reader how to do something by providing clear, organized steps or instructions.'},
-      {id:'q18',num:18,
-       text:'A student is writing a speech about staying safe online for an audience of younger students. Which choice BEST reflects awareness of this audience?',
-       opts:['Using complex statistics and technical terminology about cybersecurity','Referencing news articles written for adult professionals','Using simple language and relatable examples such as being careful about who you chat with in games','Discussing legal consequences of online misconduct in detail'],
-       ans:2,ccss:'W.4.4',domain:'Task, Purpose, and Audience',
-       feedback:'Writing for a younger audience requires simpler vocabulary and examples they can relate to from their own experience, such as online gaming.'},
-      {id:'q19',num:19,
-       text:'Which sentence makes the STRONGEST opening for a persuasive essay about reducing plastic waste?',
-       opts:['This essay is going to be about plastic waste and why it is bad.','Plastic waste is a problem that affects many countries and oceans around the world.','Every year, eight million metric tons of plastic enter the world\'s oceans, threatening marine life and entering the food chain that feeds billions of people.','I think plastic waste is a serious problem and in this essay I will explain my reasons.'],
-       ans:2,ccss:'W.4.1a',domain:'Introducing Topics',
-       feedback:'A strong persuasive introduction uses precise, compelling evidence to engage the reader immediately. Option C uses a striking statistic that makes the scale of the problem impossible to ignore.'},
-      {id:'q20',num:20,
-       text:'Which sentence BEST introduces an informational paragraph about the water cycle?',
-       opts:['The water cycle is something I learned about in science class last year.','There are many stages in the water cycle and all of them are important.','The water cycle is the continuous movement of water through evaporation, condensation, and precipitation, replenishing Earth\'s freshwater supply.','Water is very important and without it, living things would not survive on Earth.'],
-       ans:2,ccss:'W.4.2a',domain:'Introducing Topics',
-       feedback:'An effective informational introduction defines the topic clearly and precisely. Option C gives the reader a complete, accurate overview in a single sentence.'},
-      {id:'q21',num:21,
-       text:'Which sentence provides the MOST effective conclusion for an essay about the benefits of team sports?',
-       opts:['So those are the reasons why team sports are beneficial for students.','In conclusion, I think team sports are a good thing for everyone.','Team sports not only build physical fitness but also develop the collaboration and resilience that students will rely on far beyond the playing field.','Team sports are very good and everyone should play them if they can.'],
-       ans:2,ccss:'W.4.1a',domain:'Closing Topics',
-       feedback:'A strong conclusion synthesizes the key ideas without simply repeating them. Option C connects the benefits discussed (fitness, collaboration, resilience) to a broader purpose.'},
-      {id:'q22',num:22,
-       text:'A student is writing an opinion piece about whether zoos are good for animals. Which introduction is WEAKEST?',
-       opts:['While zoos claim to protect endangered species, critics argue they restrict natural behavior and create psychological harm in highly intelligent animals.','Zoos house thousands of animal species and attract millions of visitors worldwide.','In this essay I will write about zoos and whether they are good or bad for animals.','For centuries, zoos have sparked a debate: are they essential conservation centers or outdated institutions that prioritize human entertainment over animal welfare?'],
-       ans:2,ccss:'W.4.1a',domain:'Introducing Topics',
-       feedback:'Option C is the weakest because it simply announces what the essay will do rather than engaging the reader with the topic itself. Strong introductions never begin by telling the reader what the essay "will write about."'},
-      {id:'q23',num:23,
-       text:'A student is writing to persuade the school board to add a school garden. Which detail BEST supports this argument?',
-       opts:['Many famous chefs grow their own herbs and vegetables at home.','Gardening has been practiced by humans for thousands of years in all cultures.','Students who participate in school gardens show increased science scores and healthier eating habits, according to multiple studies.','Vegetables such as tomatoes, lettuce, and carrots can be grown in small spaces.'],
-       ans:2,ccss:'W.4.1b',domain:'Supporting Details',
-       feedback:'The strongest detail is directly connected to the argument (school gardens improve student outcomes) and is backed by evidence (multiple studies). Options A, B, and D are interesting but do not support the specific claim.'},
-      {id:'q24',num:24,
-       text:'Which sentence BEST develops a paragraph about the importance of sleep for students?',
-       opts:['Most students do not get enough sleep and that can be bad for them.','Sleep is something that all living things need to survive and stay healthy.','Research by the National Sleep Foundation shows that teenagers who sleep fewer than eight hours per night are 40% more likely to experience concentration difficulties.','When students are tired in class, they find it hard to pay attention to the teacher.'],
-       ans:2,ccss:'W.4.2b',domain:'Developing with Facts',
-       feedback:'Option C provides a specific, credible statistic from a named source. This is far more persuasive than general observations, which is what the other options offer.'},
-      {id:'q25',num:25,
-       text:'A student is writing a paragraph arguing that physical education should be required every school day. Arrange these sentences in the most logical order:\n\n1. Physical education should be a daily requirement for all students.\n2. Beyond fitness, daily PE has been shown to improve academic performance and classroom focus.\n3. For instance, a 2019 study found that students with daily PE scored 15% higher on math assessments.\n4. Schools that implement this policy would produce healthier, more focused, and higher-achieving students.',
-       opts:['2, 3, 1, 4','3, 1, 2, 4','1, 2, 3, 4','4, 1, 3, 2'],
-       ans:2,ccss:'W.4.1b',domain:'Organizing Ideas',
-       feedback:'Effective paragraph structure: claim (1) - supporting idea (2) - specific evidence (3) - conclusion (4). The topic sentence comes first, followed by reasoning and evidence, then a final wrap-up.'},
-      {id:'q26',num:26,
-       text:'Which sentence does NOT belong in a paragraph about how space exploration benefits life on Earth?',
-       opts:['Technologies developed for NASA, including memory foam and water filtration systems, are now widely used in everyday products.','Space exploration requires the cooperation of scientists, engineers, and governments from many countries.','The first moon landing took place on July 20, 1969, when Neil Armstrong stepped onto the lunar surface.','Satellites developed for space missions now provide the GPS navigation and weather forecasting systems used daily around the world.'],
-       ans:2,ccss:'W.4.2b',domain:'Organizing Ideas',
-       feedback:'Option C, while historically interesting, is about an event rather than a benefit to everyday life on Earth. All other options directly support the paragraph\'s claim about benefits.'},
-
-      {id:'q43',num:43,
-       text:'A student is writing a formal letter of complaint to a restaurant manager. Which tone is MOST appropriate?',
-       opts:['Angry and threatening, to make sure the manager takes it seriously','Casual and informal, as if texting a friend','Polite but firm, clearly explaining the problem and requesting a solution','Humorous, to keep the tone light and friendly'],
-       ans:2,ccss:'W.4.4',domain:'Task, Purpose, and Audience',
-       feedback:'A formal complaint requires a polite but firm tone. Aggressive or casual language is inappropriate for a formal audience. The goal is to be taken seriously while remaining professional.'},
-      {id:'q44',num:44,
-       text:'A student is writing a newspaper article about a school science fair. What is the BEST description of the task, purpose, and audience?',
-       opts:['Task: story; Purpose: entertain; Audience: science teachers','Task: article; Purpose: inform; Audience: the school community','Task: essay; Purpose: persuade; Audience: science fair judges','Task: report; Purpose: describe personal feelings; Audience: the writer's family'],
-       ans:1,ccss:'W.4.4',domain:'Task, Purpose, and Audience',
-       feedback:'A newspaper article is informative in purpose, written for a broad school community audience. It reports facts rather than persuading or expressing personal feelings.'},
-      {id:'q45',num:45,
-       text:'Which introduction BEST opens an informational essay about the history of the internet?',
-       opts:['The internet is very useful and many people use it every day around the world.','In this essay I am going to tell you about the history of the internet.','What began as a military communications network in the 1960s has evolved into a global system connecting billions of people, transforming how humanity communicates, learns, and does business.','I think the internet is one of the best inventions because it lets people connect with each other.'],
-       ans:2,ccss:'W.4.2a',domain:'Introducing Topics',
-       feedback:'Option C opens with historical context, scope, and significance — engaging the reader immediately with the scale of the topic. It avoids personal opinion and vague statements.'},
-      {id:'q46',num:46,
-       text:'Which sentence makes the WEAKEST introduction for an essay arguing that schools should start later in the morning?',
-       opts:['Across the United States, adolescents are sleeping an average of two hours less than doctors recommend, largely due to early school start times.','Sleep deprivation in teenagers is linked to lower grades, increased anxiety, and a higher risk of accidents — problems that a simple shift in school schedules could reduce.','Schools should start later in the morning and in this essay I will explain why I think this is a good idea.','When schools in Minneapolis shifted their start time from 7:15 to 8:40 a.m., student grades, attendance, and mental health all improved measurably.'],
-       ans:2,ccss:'W.4.1a',domain:'Introducing Topics',
-       feedback:'Option C is the weakest because it announces the essay rather than engaging the reader. Strong introductions open with evidence, a question, or a compelling fact — not "in this essay I will explain."'},
-      {id:'q47',num:47,
-       text:'Which conclusion BEST ends a persuasive essay about the importance of arts education in schools?',
-       opts:['In conclusion, arts education is important and schools should offer it.','That is why I believe arts classes should be kept in schools.','When schools invest in arts education, they invest in students who can think creatively, communicate powerfully, and contribute meaningfully to a world that demands both technical and human skills.','I have told you why arts education matters and I hope you agree with me.'],
-       ans:2,ccss:'W.4.1a',domain:'Closing Topics',
-       feedback:'Option C ties together the main ideas (creative thinking, communication) and connects them to a broader, meaningful purpose. It avoids simply restating the opinion or addressing the reader directly.'},
-      {id:'q48',num:48,
-       text:'Which detail provides the STRONGEST factual support for a paragraph arguing that cycling to school improves student wellbeing?',
-       opts:['Many students enjoy cycling because it is a fun and social activity.','Bicycles come in many different styles and are available at various price points.','A study published in the British Journal of Sports Medicine found that students who cycled to school demonstrated 15% higher attention scores and reported lower stress levels than those who travelled by car.','Some schools have cycle storage areas where students can park their bikes safely.'],
-       ans:2,ccss:'W.4.1b',domain:'Supporting Details',
-       feedback:'Option C provides a named, credible source with specific measurable data directly supporting the argument. Vague observations and unrelated facts do not serve as evidence.'},
-      {id:'q49',num:49,
-       text:'Which sentence is IRRELEVANT to a paragraph arguing that public libraries should stay open longer?',
-       opts:['Many working adults can only access library services in the evening after finishing work.','Extended opening hours would allow students to use library computers and resources for homework.','The first public library in the United States was established in 1833 in Peterborough, New Hampshire.','Communities with longer library hours report higher levels of digital literacy and civic engagement.'],
-       ans:2,ccss:'W.4.2b',domain:'Organizing Ideas',
-       feedback:'Option C is a historical fact unrelated to the argument for longer opening hours. Every sentence in an argumentative paragraph must directly support the claim being made.'},
-      {id:'q50',num:50,
-       text:'Arrange the following sentences in the MOST logical order for an informational paragraph about how earthquakes form:
-
-1. The point where rupture begins is called the focus, and the point directly above it on the surface is called the epicentre.
-2. When the built-up pressure finally exceeds the strength of the rock, the plates suddenly rupture and move.
-3. Earthquakes occur when tectonic plates — large sections of Earth's crust — grind against each other along fault lines.
-4. The energy released travels outward as seismic waves, causing the ground to shake.',
-       opts:['1, 2, 3, 4','3, 2, 1, 4','3, 1, 2, 4','2, 3, 4, 1'],
-       ans:1,ccss:'W.4.2b',domain:'Organizing Ideas',
-       feedback:'Logical sequence: introduce the cause (3), explain what happens next (2), define the specific terms involved (1), then describe the effect (4). This follows the sequence of events in the process.'},
-      {id:'q51',num:51,
-       text:'A student is drafting an opinion paragraph. Which version of the topic sentence is STRONGEST?',
-       opts:['I am going to write about why homework should be reduced.','There are many things to consider about homework and whether it should be reduced.','Reducing homework to thirty minutes per night would improve student wellbeing without sacrificing academic achievement.','Homework is something that all students have to do and some people think there is too much of it.'],
-       ans:2,ccss:'W.4.1b',domain:'Supporting Details',
-       feedback:'Option C states a precise, arguable claim with a clear position and implies the reasoning. It is specific enough to guide the paragraph and strong enough to invite a counterargument.'},
-      {id:'q52',num:52,
-       text:'Which paragraph is BEST organized?',
-       opts:['Schools should have longer recesses. Also, recesses are fun. Students play a lot. It is good for students to play outside and get fresh air. Recess is an important part of the school day.','Extending recess to 30 minutes daily would benefit students academically and socially. Research shows that regular physical breaks improve concentration and reduce disruptive behaviour in class. In addition, unstructured play during recess supports the development of social skills such as cooperation and conflict resolution. For these reasons, longer recesses should be a priority in every school.','Recess should be longer. Students need a break. They are tired of studying. It is important. Schools should do this.','There are many different opinions about recess length. Some people think it should be longer. Others do not. It is a complicated question with no easy answers.'],
-       ans:1,ccss:'W.4.1b',domain:'Organizing Ideas',
-       feedback:'Option B is the strongest: it opens with a clear topic sentence, develops it with research evidence, adds a second supporting point with specific details, and closes with a conclusion that follows logically from the evidence.'},    ]
+      {id:'q17',num:17,text:'A student is writing a guide explaining how to care for a pet hamster. What is the primary PURPOSE of this writing?',opts:['To entertain readers with a funny story about hamsters','To persuade readers to adopt a hamster as a pet','To inform readers about the steps needed to care for a hamster','To express personal feelings about having a hamster'],ans:2,ccss:'W.4.4',domain:'Task, Purpose, and Audience',feedback:'A how-to guide has an informative purpose.'},
+      {id:'q18',num:18,text:'A student is writing a speech about staying safe online for an audience of younger students. Which choice BEST reflects awareness of this audience?',opts:['Using complex statistics and technical terminology about cybersecurity','Referencing news articles written for adult professionals','Using simple language and relatable examples such as being careful about who you chat with in games','Discussing legal consequences of online misconduct in detail'],ans:2,ccss:'W.4.4',domain:'Task, Purpose, and Audience',feedback:'Writing for a younger audience requires simpler vocabulary and relatable examples.'},
+      {id:'q19',num:19,text:'Which sentence makes the STRONGEST opening for a persuasive essay about reducing plastic waste?',opts:['This essay is going to be about plastic waste and why it is bad.','Plastic waste is a problem that affects many countries and oceans around the world.','Every year, eight million metric tons of plastic enter the world\'s oceans, threatening marine life and entering the food chain that feeds billions of people.','I think plastic waste is a serious problem and in this essay I will explain my reasons.'],ans:2,ccss:'W.4.1a',domain:'Introducing Topics',feedback:'A strong persuasive introduction uses precise, compelling evidence.'},
+      {id:'q20',num:20,text:'Which sentence BEST introduces an informational paragraph about the water cycle?',opts:['The water cycle is something I learned about in science class last year.','There are many stages in the water cycle and all of them are important.','The water cycle is the continuous movement of water through evaporation, condensation, and precipitation, replenishing Earth\'s freshwater supply.','Water is very important and without it, living things would not survive on Earth.'],ans:2,ccss:'W.4.2a',domain:'Introducing Topics',feedback:'An effective informational introduction defines the topic clearly and precisely.'},
+      {id:'q21',num:21,text:'Which sentence provides the MOST effective conclusion for an essay about the benefits of team sports?',opts:['So those are the reasons why team sports are beneficial for students.','In conclusion, I think team sports are a good thing for everyone.','Team sports not only build physical fitness but also develop the collaboration and resilience that students will rely on far beyond the playing field.','Team sports are very good and everyone should play them if they can.'],ans:2,ccss:'W.4.1a',domain:'Closing Topics',feedback:'A strong conclusion synthesizes the key ideas without simply repeating them.'},
+      {id:'q22',num:22,text:'A student is writing an opinion piece about whether zoos are good for animals. Which introduction is WEAKEST?',opts:['While zoos claim to protect endangered species, critics argue they restrict natural behavior and create psychological harm in highly intelligent animals.','Zoos house thousands of animal species and attract millions of visitors worldwide.','In this essay I will write about zoos and whether they are good or bad for animals.','For centuries, zoos have sparked a debate: are they essential conservation centers or outdated institutions that prioritize human entertainment over animal welfare?'],ans:2,ccss:'W.4.1a',domain:'Introducing Topics',feedback:'Option C is the weakest because it simply announces what the essay will do.'},
+      {id:'q23',num:23,text:'A student is writing to persuade the school board to add a school garden. Which detail BEST supports this argument?',opts:['Many famous chefs grow their own herbs and vegetables at home.','Gardening has been practiced by humans for thousands of years in all cultures.','Students who participate in school gardens show increased science scores and healthier eating habits, according to multiple studies.','Vegetables such as tomatoes, lettuce, and carrots can be grown in small spaces.'],ans:2,ccss:'W.4.1b',domain:'Supporting Details',feedback:'The strongest detail is directly connected to the argument and backed by evidence.'},
+      {id:'q24',num:24,text:'Which sentence BEST develops a paragraph about the importance of sleep for students?',opts:['Most students do not get enough sleep and that can be bad for them.','Sleep is something that all living things need to survive and stay healthy.','Research by the National Sleep Foundation shows that teenagers who sleep fewer than eight hours per night are 40% more likely to experience concentration difficulties.','When students are tired in class, they find it hard to pay attention to the teacher.'],ans:2,ccss:'W.4.2b',domain:'Developing with Facts',feedback:'Option C provides a specific, credible statistic from a named source.'},
+      {id:'q25',num:25,text:'A student is writing a paragraph arguing that physical education should be required every school day. Arrange these sentences in the most logical order:\n\n1. Physical education should be a daily requirement for all students.\n2. Beyond fitness, daily PE has been shown to improve academic performance and classroom focus.\n3. For instance, a 2019 study found that students with daily PE scored 15% higher on math assessments.\n4. Schools that implement this policy would produce healthier, more focused, and higher-achieving students.',opts:['2, 3, 1, 4','3, 1, 2, 4','1, 2, 3, 4','4, 1, 3, 2'],ans:2,ccss:'W.4.1b',domain:'Organizing Ideas',feedback:'Effective paragraph structure: claim - supporting idea - specific evidence - conclusion.'},
+      {id:'q26',num:26,text:'Which sentence does NOT belong in a paragraph about how space exploration benefits life on Earth?',opts:['Technologies developed for NASA, including memory foam and water filtration systems, are now widely used in everyday products.','Space exploration requires the cooperation of scientists, engineers, and governments from many countries.','The first moon landing took place on July 20, 1969, when Neil Armstrong stepped onto the lunar surface.','Satellites developed for space missions now provide the GPS navigation and weather forecasting systems used daily around the world.'],ans:2,ccss:'W.4.2b',domain:'Organizing Ideas',feedback:'Option C is about an event rather than a benefit to everyday life on Earth.'},
+      {id:'q43',num:43,text:'A student is writing a formal letter of complaint to a restaurant manager. Which tone is MOST appropriate?',opts:['Angry and threatening, to make sure the manager takes it seriously','Casual and informal, as if texting a friend','Polite but firm, clearly explaining the problem and requesting a solution','Humorous, to keep the tone light and friendly'],ans:2,ccss:'W.4.4',domain:'Task, Purpose, and Audience',feedback:'A formal complaint requires a polite but firm tone.'},
+      {id:'q44',num:44,text:'A student is writing a newspaper article about a school science fair. What is the BEST description of the task, purpose, and audience?',opts:['Task: story; Purpose: entertain; Audience: science teachers','Task: article; Purpose: inform; Audience: the school community','Task: essay; Purpose: persuade; Audience: science fair judges','Task: report; Purpose: describe personal feelings; Audience: the writer\'s family'],ans:1,ccss:'W.4.4',domain:'Task, Purpose, and Audience',feedback:'A newspaper article is informative in purpose, written for a broad school community audience.'},
+      {id:'q45',num:45,text:'Which introduction BEST opens an informational essay about the history of the internet?',opts:['The internet is very useful and many people use it every day around the world.','In this essay I am going to tell you about the history of the internet.','What began as a military communications network in the 1960s has evolved into a global system connecting billions of people, transforming how humanity communicates, learns, and does business.','I think the internet is one of the best inventions because it lets people connect with each other.'],ans:2,ccss:'W.4.2a',domain:'Introducing Topics',feedback:'Option C opens with historical context, scope, and significance.'},
+      {id:'q46',num:46,text:'Which sentence makes the WEAKEST introduction for an essay arguing that schools should start later in the morning?',opts:['Across the United States, adolescents are sleeping an average of two hours less than doctors recommend, largely due to early school start times.','Sleep deprivation in teenagers is linked to lower grades, increased anxiety, and a higher risk of accidents — problems that a simple shift in school schedules could reduce.','Schools should start later in the morning and in this essay I will explain why I think this is a good idea.','When schools in Minneapolis shifted their start time from 7:15 to 8:40 a.m., student grades, attendance, and mental health all improved measurably.'],ans:2,ccss:'W.4.1a',domain:'Introducing Topics',feedback:'Option C is the weakest because it announces the essay rather than engaging the reader.'},
+      {id:'q47',num:47,text:'Which conclusion BEST ends a persuasive essay about the importance of arts education in schools?',opts:['In conclusion, arts education is important and schools should offer it.','That is why I believe arts classes should be kept in schools.','When schools invest in arts education, they invest in students who can think creatively, communicate powerfully, and contribute meaningfully to a world that demands both technical and human skills.','I have told you why arts education matters and I hope you agree with me.'],ans:2,ccss:'W.4.1a',domain:'Closing Topics',feedback:'Option C ties together the main ideas and connects them to a broader purpose.'},
+      {id:'q48',num:48,text:'Which detail provides the STRONGEST factual support for a paragraph arguing that cycling to school improves student wellbeing?',opts:['Many students enjoy cycling because it is a fun and social activity.','Bicycles come in many different styles and are available at various price points.','A study published in the British Journal of Sports Medicine found that students who cycled to school demonstrated 15% higher attention scores and reported lower stress levels than those who travelled by car.','Some schools have cycle storage areas where students can park their bikes safely.'],ans:2,ccss:'W.4.1b',domain:'Supporting Details',feedback:'Option C provides a named, credible source with specific measurable data.'},
+      {id:'q49',num:49,text:'Which sentence is IRRELEVANT to a paragraph arguing that public libraries should stay open longer?',opts:['Many working adults can only access library services in the evening after finishing work.','Extended opening hours would allow students to use library computers and resources for homework.','The first public library in the United States was established in 1833 in Peterborough, New Hampshire.','Communities with longer library hours report higher levels of digital literacy and civic engagement.'],ans:2,ccss:'W.4.2b',domain:'Organizing Ideas',feedback:'Option C is a historical fact unrelated to the argument for longer opening hours.'},
+      {id:'q50',num:50,text:'Arrange the following sentences in the MOST logical order for an informational paragraph about how earthquakes form:\n\n1. The point where rupture begins is called the focus, and the point directly above it on the surface is called the epicentre.\n2. When the built-up pressure finally exceeds the strength of the rock, the plates suddenly rupture and move.\n3. Earthquakes occur when tectonic plates — large sections of Earth\'s crust — grind against each other along fault lines.\n4. The energy released travels outward as seismic waves, causing the ground to shake.',opts:['1, 2, 3, 4','3, 2, 1, 4','3, 1, 2, 4','2, 3, 4, 1'],ans:1,ccss:'W.4.2b',domain:'Organizing Ideas',feedback:'Logical sequence: introduce the cause, explain what happens next, define terms, describe the effect.'},
+      {id:'q51',num:51,text:'A student is drafting an opinion paragraph. Which version of the topic sentence is STRONGEST?',opts:['I am going to write about why homework should be reduced.','There are many things to consider about homework and whether it should be reduced.','Reducing homework to thirty minutes per night would improve student wellbeing without sacrificing academic achievement.','Homework is something that all students have to do and some people think there is too much of it.'],ans:2,ccss:'W.4.1b',domain:'Supporting Details',feedback:'Option C states a precise, arguable claim with a clear position.'},
+      {id:'q52',num:52,text:'Which paragraph is BEST organized?',opts:['Schools should have longer recesses. Also, recesses are fun. Students play a lot. It is good for students to play outside and get fresh air. Recess is an important part of the school day.','Extending recess to 30 minutes daily would benefit students academically and socially. Research shows that regular physical breaks improve concentration and reduce disruptive behaviour in class. In addition, unstructured play during recess supports the development of social skills such as cooperation and conflict resolution. For these reasons, longer recesses should be a priority in every school.','Recess should be longer. Students need a break. They are tired of studying. It is important. Schools should do this.','There are many different opinions about recess length. Some people think it should be longer. Others do not. It is a complicated question with no easy answers.'],ans:1,ccss:'W.4.1b',domain:'Organizing Ideas',feedback:'Option B opens with a clear topic sentence, develops it with evidence, and closes with a logical conclusion.'},
+    ]
   },
   {
     id:'s3',
     title:'Section 3: Written Responses',
     ccss:'W.4.4 - W.4.1 - W.4.2 - L.4.1 - L.4.2',
-    desc:'Complete both writing tasks in full sentences. Each task is worth 6 points. Write carefully - there is no right or wrong answer, but your writing will be scored on organization, support, grammar, and completeness.',
+    desc:'Complete all writing tasks in full sentences. Each task is worth 6 points. Write carefully - there is no right or wrong answer, but your writing will be scored on organization, support, grammar, and completeness.',
     questions:[],
     written:true
   }
@@ -732,8 +521,15 @@ let answers={};
 let writtenAnswers={};
 let mcqScore=0;
 
+// ============================================================
+// FIX: Robust checkbox handler
+// ============================================================
 function checkAgreement(){
-  document.getElementById('btn-start').disabled=!document.getElementById('agree-check').checked;
+  var cb = document.getElementById('agree-check');
+  var btn = document.getElementById('btn-start');
+  if(cb && btn){
+    btn.disabled = !cb.checked;
+  }
 }
 
 function startTest(){
@@ -742,7 +538,6 @@ function startTest(){
   document.getElementById('hdr-student').textContent=name;
   document.getElementById('cover').classList.remove('active');
   document.getElementById('test').classList.add('active');
-  document.getElementById('test-date').value=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   buildDots();
   renderSec(0);
   startTimer();
@@ -761,7 +556,7 @@ function buildDots(){
 
 function updateDots(){
   document.querySelectorAll('.sec-dot').forEach((d,i)=>{
-    d.className='sec-dot'+(i<currentSec?'done':(i===currentSec?'active':''));
+    d.className='sec-dot'+(i<currentSec?' done':(i===currentSec?' active':''));
   });
 }
 
@@ -785,9 +580,7 @@ function renderSec(idx){
   body.innerHTML='';
   const hd=document.createElement('div');
   hd.className='sec-hd';
-  hd.innerHTML=`<h3>${sec.title}</h3>
-    <div class="sec-ccss">${sec.ccss}</div>
-    <div class="sec-desc">${sec.desc}</div>`;
+  hd.innerHTML='<h3>'+sec.title+'</h3><div class="sec-ccss">'+sec.ccss+'</div><div class="sec-desc">'+sec.desc+'</div>';
   body.appendChild(hd);
   if(!sec.written){
     sec.questions.forEach(q=>body.appendChild(buildMCQ(q)));
@@ -796,8 +589,8 @@ function renderSec(idx){
   }
   updateProgress();
   updateDots();
-  document.getElementById('q-counter').textContent=`Section ${idx+1} of ${SECTIONS.length}`;
-  document.getElementById('nav-info').textContent=`Section ${idx+1} of ${SECTIONS.length}`;
+  document.getElementById('q-counter').textContent='Section '+(idx+1)+' of '+SECTIONS.length;
+  document.getElementById('nav-info').textContent='Section '+(idx+1)+' of '+SECTIONS.length;
   document.getElementById('btn-prev').disabled=(idx===0);
   const isLast=(idx===SECTIONS.length-1);
   const nb=document.getElementById('btn-next');
@@ -814,30 +607,14 @@ function buildMCQ(q){
   const textParts=q.text.split('\n');
   const mainText=textParts[0];
   const blockText=textParts.slice(1).join('\n').trim();
-  card.innerHTML=`
-  <div class="q-meta">
-    <span class="q-badge num">Q${q.num}</span>
-    <span class="q-badge ccss">${q.ccss}</span>
-    <span class="q-badge domain">${q.domain}</span>
-  </div>
-  <div class="q-text">${mainText}${blockText?`<div class="block-text">${blockText}</div>`:''}</div>
-  <div class="options" id="opts-${q.id}">
-    ${q.opts.map((o,i)=>`
-    <div class="opt${sel===i?' selected':''} ${sel!==undefined?'locked':''}"
-      id="opt-${q.id}-${i}"
-      ${sel===undefined?`onclick="selectOpt('${q.id}',${i})"`:''}>
-      <div class="opt-letter">${letters[i]}</div>
-      <span>${o}</span>
-    </div>`).join('')}
-  </div>`;
+  card.innerHTML='<div class="q-meta"><span class="q-badge num">Q'+q.num+'</span><span class="q-badge ccss">'+q.ccss+'</span><span class="q-badge domain">'+q.domain+'</span></div><div class="q-text">'+mainText+(blockText?'<div class="block-text">'+blockText+'</div>':'')+'</div><div class="options" id="opts-'+q.id+'">'+q.opts.map((o,i)=>'<div class="opt'+(sel===i?' selected':'')+(sel!==undefined?' locked':'')+'" id="opt-'+q.id+'-'+i+'" '+(sel===undefined?'onclick="selectOpt(\''+q.id+'\','+i+')"':'')+'><div class="opt-letter">'+letters[i]+'</div><span>'+o+'</span></div>').join('')+'</div>';
   return card;
 }
 
-// Official test: no feedback shown during test
 function selectOpt(qid,idx){
   if(answers[qid]!==undefined)return;
   answers[qid]=idx;
-  document.querySelectorAll(`[id^="opt-${qid}-"]`).forEach((opt,i)=>{
+  document.querySelectorAll('[id^="opt-'+qid+'-"]').forEach((opt,i)=>{
     opt.classList.add('locked');
     opt.removeAttribute('onclick');
     if(i===idx)opt.classList.add('selected');
@@ -849,24 +626,7 @@ function buildWritten(wq){
   const card=document.createElement('div');
   card.className='wr-card';
   const val=writtenAnswers[wq.id]||'';
-  card.innerHTML=`
-  <div class="q-meta">
-    <span class="q-badge num">Written Response ${wq.num}</span>
-    <span class="q-badge ccss">W.4.4</span>
-    <span class="q-badge domain">Written Response</span>
-    <span class="wr-points">${wq.points} points</span>
-  </div>
-  <h4>${wq.title}</h4>
-  <div class="wr-prompt">${wq.prompt.replace(/\n/g,'<br>')}
-    ${wq.passage?`<div class="passage-block">${wq.passage}</div>`:''}
-  </div>
-  <div class="wr-criteria">
-    <strong>Scoring Criteria (for teacher reference)</strong>
-    <ul>${wq.rubric.map(r=>`<li><strong>${r.criterion} (${r.pts} pt${r.pts>1?'s':''}):</strong> ${r.desc}</li>`).join('')}</ul>
-  </div>
-  <textarea class="wr-textarea" id="wr-${wq.id}" placeholder="Write your response here. Use complete sentences."
-    oninput="saveWritten('${wq.id}',this.value)">${val}</textarea>
-  <div class="wr-counter" id="wc-${wq.id}">${val.trim().split(/\s+/).filter(w=>w).length} words</div>`;
+  card.innerHTML='<div class="q-meta"><span class="q-badge num">Written Response '+wq.num+'</span><span class="q-badge ccss">W.4.4</span><span class="q-badge domain">Written Response</span><span class="wr-points">'+wq.points+' points</span></div><h4>'+wq.title+'</h4><div class="wr-prompt">'+wq.prompt.replace(/\n/g,'<br>')+(wq.passage?'<div class="passage-block">'+wq.passage+'</div>':'')+'</div><div class="wr-criteria"><strong>Scoring Criteria (for teacher reference)</strong><ul>'+wq.rubric.map(r=>'<li><strong>'+r.criterion+' ('+r.pts+' pt'+(r.pts>1?'s':'')+')</strong>: '+r.desc+'</li>').join('')+'</ul></div><textarea class="wr-textarea" id="wr-'+wq.id+'" placeholder="Write your response here. Use complete sentences." oninput="saveWritten(\''+wq.id+'\',this.value)">'+val+'</textarea><div class="wr-counter" id="wc-'+wq.id+'">'+val.trim().split(/\s+/).filter(w=>w).length+' words</div>';
   return card;
 }
 
@@ -890,8 +650,8 @@ function trySubmit(){
   const unanswered=allQ.filter(q=>answers[q.id]===undefined).length;
   const noWR=WRITTEN_QS.filter(wq=>!(writtenAnswers[wq.id]||'').trim()).length;
   let msg='Are you sure you want to submit your official test?';
-  if(unanswered>0)msg+=` You have ${unanswered} unanswered MCQ question${unanswered>1?'s':''}.`;
-  if(noWR>0)msg+=` You have ${noWR} incomplete written response${noWR>1?'s':''}.`;
+  if(unanswered>0)msg+=' You have '+unanswered+' unanswered MCQ question'+(unanswered>1?'s':'')+'.';
+  if(noWR>0)msg+=' You have '+noWR+' incomplete written response'+(noWR>1?'s':'')+'.';
   document.getElementById('modal-msg').textContent=msg;
   document.getElementById('confirm-modal').classList.add('show');
 }
@@ -907,77 +667,42 @@ function updateProgress(){
 }
 
 // ============================================================
+// WRITTEN SCORING — teacher rubric inputs (was missing)
+// ============================================================
+const writtenScores = {};
+function updateWrittenTotal(wqIdx, rIdx, val, maxPts) {
+  val = parseInt(val) || 0;
+  if (val < 0) val = 0;
+  if (val > maxPts) val = maxPts;
+  if (!writtenScores[wqIdx]) writtenScores[wqIdx] = {};
+  writtenScores[wqIdx][rIdx] = val;
+
+  var wq = ['wq1','wq2','wq3'][wqIdx];
+  var sub = 0;
+  Object.values(writtenScores[wqIdx]).forEach(function(v){ sub += v; });
+  var subEl = document.getElementById('wq-sub-' + wq);
+  if (subEl) subEl.textContent = sub;
+
+  var grand = 0;
+  Object.values(writtenScores).forEach(function(wqScores){
+    Object.values(wqScores).forEach(function(v){ grand += v; });
+  });
+  document.getElementById('written-total').textContent = grand;
+
+  var mcqRaw = document.getElementById('score-raw').textContent.split('/')[0].trim();
+  var mcqNum = parseInt(mcqRaw) || 0;
+  document.getElementById('combined-display').textContent = (mcqNum + grand) + ' / 70';
+}
+
+// ============================================================
 // SUBMIT AND RESULTS
 // ============================================================
-
-// ============================================================
-// AUTO-SUBMISSION via Formspree — fires automatically on submit
-// ============================================================
 async function sendToFormspree(scoreData){
-  const bannerEl = document.getElementById('submit-banner');
-  const endpoint = getFsEndpoint();
-
+  var bannerEl = document.getElementById('submit-banner');
+  var endpoint = getFsEndpoint();
   if(bannerEl){ bannerEl.textContent='Submitting results — please wait...'; bannerEl.style.background='#edf2f8'; bannerEl.style.color='#546e8a'; bannerEl.style.borderColor='#d4dce8'; }
-
   function safe(str){ return (str||'No response submitted.').substring(0,3000); }
-
-  // Build a clean plain-text full report
-  function buildFullReport(){
-    const allQ = SECTIONS.flatMap(s => s.questions || []);
-    let report = '';
-    report += '='.repeat(60) + '\n';
-    report += 'GRADE 4 OFFICIAL ASSESSMENT 1 - LANGUAGE AND WRITING\n';
-    report += 'FULL RESULT REPORT\n';
-    report += '='.repeat(60) + '\n\n';
-    report += 'Student:   ' + scoreData.student_name + '\n';
-    report += 'Teacher:   ' + scoreData.teacher + '\n';
-    report += 'Date:      ' + scoreData.test_date + '\n';
-    report += 'Test Type: ' + scoreData.test_type + '\n';
-    report += 'MCQ Score: ' + scoreData.mcq_score + '\n\n';
-    report += 'SCORE BY STANDARD\n';
-    report += '-'.repeat(40) + '\n';
-    report += scoreData.score_breakdown + '\n';
-    report += 'QUESTION-BY-QUESTION REVIEW\n';
-    report += '-'.repeat(40) + '\n';
-    let qn = 0;
-    SECTIONS.forEach(sec => {
-      if(sec.questions && sec.questions.length){
-        report += '\n' + sec.title.toUpperCase() + '\n';
-        sec.questions.forEach(q => {
-          qn++;
-          const userAns = answers[q.id];
-          const correct = userAns === q.ans;
-          report += 'Q' + qn + '. [' + (correct ? 'CORRECT' : 'WRONG  ') + '] ' + q.text.split('\n')[0] + '\n';
-          if(!correct){
-            report += '   Student answered: ' + (userAns !== undefined ? q.opts[userAns] : 'Not answered') + '\n';
-            report += '   Correct answer:   ' + q.opts[q.ans] + '\n';
-            report += '   Explanation: ' + q.feedback + '\n';
-          }
-        });
-      }
-    });
-    report += '\n' + '='.repeat(60) + '\n';
-    report += 'WRITTEN RESPONSES\n';
-    report += '='.repeat(60) + '\n\n';
-    WRITTEN_QS.forEach((wq, i) => {
-      report += 'WRITTEN RESPONSE ' + (i+1) + ': ' + wq.title + '\n';
-      report += '-'.repeat(40) + '\n';
-      report += (scoreData['written_response_' + (i+1)] || 'No response submitted.') + '\n\n';
-      report += 'SCORING RUBRIC:\n';
-      wq.rubric.forEach(r => {
-        report += '  - ' + r.criterion + ' (' + r.pts + ' pt): ' + r.desc + '\n';
-      });
-      report += '  TEACHER SCORE: ___ / ' + wq.points + '\n\n';
-    });
-    report += '='.repeat(60) + '\n';
-    report += 'MCQ: ' + scoreData.mcq_score + ' | Written: ___ / 18 | TOTAL: ___ / 70\n';
-    report += '='.repeat(60) + '\n';
-    return report;
-  }
-
-  const fullReport = buildFullReport();
-
-  const payload = {
+  var payload = {
     _subject:        scoreData._subject,
     _replyto:        'noreply@exactpath.test',
     test_type:       scoreData.test_type,
@@ -992,187 +717,116 @@ async function sendToFormspree(scoreData){
     written_2:       safe(scoreData.written_response_2),
     written_3_title: 'Written Response 3 (Extended Writing)',
     written_3:       safe(scoreData.written_response_3),
-    full_question_review: fullReport.substring(0, 5000),
-    full_question_review_2: fullReport.length > 5000 ? fullReport.substring(5000, 10000) : '',
+    full_question_review: (scoreData.full_report_part1||'').substring(0,5000),
+    full_question_review_2: (scoreData.full_report_part2||''),
   };
-
   try{
-    const resp = await fetch(endpoint, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const data = await resp.json();
+    var resp = await fetch(endpoint, {method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+    var data = await resp.json();
     if(resp.ok){
       if(bannerEl){ bannerEl.textContent='Results submitted to your teacher successfully.'; bannerEl.style.background='#e6f9ee'; bannerEl.style.color='#1a5c35'; bannerEl.style.borderColor='#a8dfc0'; bannerEl.style.fontWeight='700'; }
     } else {
-      const msg = (data.errors||[]).map(e=>e.message).join(', ') || ('Status '+resp.status);
-      if(bannerEl){
-        bannerEl.innerHTML = 'Submission error: '+msg+
-          '<br><small style="font-weight:400;display:block;margin-top:6px">Make sure <strong>'+window.location.hostname+
-          '</strong> is listed in Formspree Settings > Allowed Domains.</small>';
-        bannerEl.style.background='#fdeaea'; bannerEl.style.color='#8c1c1c'; bannerEl.style.borderColor='#f5c6c6';
-      }
+      var msg = (data.errors||[]).map(function(e){return e.message;}).join(', ') || ('Status '+resp.status);
+      if(bannerEl){ bannerEl.innerHTML = 'Submission error: '+msg; bannerEl.style.background='#fdeaea'; bannerEl.style.color='#8c1c1c'; bannerEl.style.borderColor='#f5c6c6'; }
     }
   } catch(netErr){
-    if(bannerEl){
-      bannerEl.innerHTML = 'Network error: '+netErr.message+
-        '<br><small style="font-weight:400;display:block;margin-top:6px">Check your internet connection and try again.</small>';
-      bannerEl.style.background='#fdeaea'; bannerEl.style.color='#8c1c1c'; bannerEl.style.borderColor='#f5c6c6';
-    }
+    if(bannerEl){ bannerEl.innerHTML = 'Network error: '+netErr.message+'<br><small>Check your internet connection and try again.</small>'; bannerEl.style.background='#fdeaea'; bannerEl.style.color='#8c1c1c'; bannerEl.style.borderColor='#f5c6c6'; }
   }
 }
 
 function submitTest(){
   clearInterval(timerInterval);
   document.getElementById('confirm-modal').classList.remove('show');
-
-  const allQ = SECTIONS.flatMap(s => s.questions || []);
-  let correct = 0;
-  allQ.forEach(q => { if(answers[q.id] === q.ans) correct++; });
-  const total = allQ.length;
-  const pct   = Math.round(correct / total * 100);
-
-  const domains = {};
-  allQ.forEach(q => {
+  var allQ = SECTIONS.flatMap(function(s){return s.questions||[];});
+  var correct = 0;
+  allQ.forEach(function(q){ if(answers[q.id] === q.ans) correct++; });
+  var total = allQ.length;
+  var pct = Math.round(correct / total * 100);
+  var domains = {};
+  allQ.forEach(function(q){
     if(!domains[q.domain]) domains[q.domain] = {correct:0, total:0};
     domains[q.domain].total++;
     if(answers[q.id] === q.ans) domains[q.domain].correct++;
   });
-
-  // Switch screens
   document.getElementById('test').classList.remove('active');
   document.getElementById('results').classList.add('active');
-
-  const name    = document.getElementById('student-name').value;
-  const date    = document.getElementById('test-date').value;
-  const teacher = document.getElementById('teacher-name').value || 'Not specified';
-
+  var name = document.getElementById('student-name').value;
+  var date = document.getElementById('test-date').value;
+  var teacher = document.getElementById('teacher-name').value || 'Not specified';
   document.getElementById('res-meta1').textContent = 'Student: ' + name + (teacher !== 'Not specified' ? ' — Teacher: ' + teacher : '');
   document.getElementById('res-meta2').textContent = 'Date: ' + date;
-  document.getElementById('score-pct').textContent  = pct + '%';
-  document.getElementById('score-raw').textContent  = correct + ' / ' + total;
+  document.getElementById('score-pct').textContent = pct + '%';
+  document.getElementById('score-raw').textContent = correct + ' / ' + total;
   document.getElementById('combined-display').textContent = correct + ' + __ / 70';
-
-  setTimeout(() => {
+  setTimeout(function(){
     document.getElementById('score-arc').style.strokeDashoffset = 427 - (427 * (pct / 100));
   }, 300);
-
-  let grade, gpClass, msg;
-  if     (pct >= 90){ grade='A'; gpClass='A'; msg='Excellent performance. Strong mastery demonstrated across all standards.'; }
+  var grade, gpClass, msg;
+  if(pct >= 90){ grade='A'; gpClass='A'; msg='Excellent performance. Strong mastery demonstrated across all standards.'; }
   else if(pct >= 80){ grade='B'; gpClass='B'; msg='Good performance. Solid understanding with a few areas to review.'; }
   else if(pct >= 70){ grade='C'; gpClass='C'; msg='Satisfactory. Review the standards where points were lost with your teacher.'; }
-  else              { grade='D'; gpClass='D'; msg='Further practice needed. Please review all sections with your teacher.'; }
-  document.getElementById('grade-pill-wrap').innerHTML = `<div class="grade-pill grade-${gpClass}">${grade} — ${pct}% (MCQ only)</div>`;
+  else { grade='D'; gpClass='D'; msg='Further practice needed. Please review all sections with your teacher.'; }
+  document.getElementById('grade-pill-wrap').innerHTML = '<div class="grade-pill grade-'+gpClass+'">'+grade+' — '+pct+'% (MCQ only)</div>';
   document.getElementById('perf-msg').textContent = msg;
-
-  // Domain breakdown
-  const dWrap = document.getElementById('domain-breakdown');
+  var dWrap = document.getElementById('domain-breakdown');
   dWrap.innerHTML = '';
-  Object.entries(domains).forEach(([dom, data]) => {
-    const dpct = Math.round(data.correct / data.total * 100);
-    dWrap.innerHTML += `<div class="domain-row">
-      <div class="domain-label">${dom}</div>
-      <div class="domain-bar-wrap"><div class="domain-bar" style="width:0%" data-w="${dpct}%"></div></div>
-      <div class="domain-score">${data.correct}/${data.total}</div>
-    </div>`;
+  Object.entries(domains).forEach(function(entry){
+    var dom=entry[0], data=entry[1];
+    var dpct = Math.round(data.correct / data.total * 100);
+    dWrap.innerHTML += '<div class="domain-row"><div class="domain-label">'+dom+'</div><div class="domain-bar-wrap"><div class="domain-bar" style="width:0%" data-w="'+dpct+'%"></div></div><div class="domain-score">'+data.correct+'/'+data.total+'</div></div>';
   });
-  setTimeout(() => {
-    document.querySelectorAll('.domain-bar').forEach(b => b.style.width = b.dataset.w);
+  setTimeout(function(){
+    document.querySelectorAll('.domain-bar').forEach(function(b){ b.style.width = b.dataset.w; });
   }, 500);
-
-  // MCQ answer review (answers revealed only now)
-  const revWrap = document.getElementById('answer-review');
+  var revWrap = document.getElementById('answer-review');
   revWrap.innerHTML = '';
-  let qn = 0;
-  SECTIONS.forEach(sec => {
-    if(sec.questions && sec.questions.length) {
-      const lbl = document.createElement('p');
+  var qn = 0;
+  SECTIONS.forEach(function(sec){
+    if(sec.questions && sec.questions.length){
+      var lbl = document.createElement('p');
       lbl.style.cssText = 'font-weight:700;font-size:.82rem;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px';
       lbl.textContent = sec.title;
       revWrap.appendChild(lbl);
-      sec.questions.forEach(q => {
+      sec.questions.forEach(function(q){
         qn++;
-        const ok = answers[q.id] === q.ans;
-        const r  = document.createElement('div');
+        var ok = answers[q.id] === q.ans;
+        var r = document.createElement('div');
         r.className = 'rev-item ' + (ok ? 'ok' : 'no');
-        r.innerHTML = `<div class="rev-icon">${ok ? '[OK]' : '[X]'}</div>
-          <div>
-            <div class="rev-q">Q${qn}. ${q.text.split('\n')[0]}</div>
-            <div class="rev-ans">${ok
-              ? 'Correct: ' + q.opts[q.ans]
-              : 'Your answer: ' + (answers[q.id] !== undefined ? q.opts[answers[q.id]] : 'Not answered') + ' — Correct: ' + q.opts[q.ans]
-            }</div>
-            ${!ok ? `<div class="rev-ans" style="color:#5a2020;margin-top:3px;font-style:italic">${q.feedback}</div>` : ''}
-          </div>`;
+        r.innerHTML = '<div class="rev-icon">'+(ok ? '[OK]' : '[X]')+'</div><div><div class="rev-q">Q'+qn+'. '+q.text.split('\n')[0]+'</div><div class="rev-ans">'+(ok ? 'Correct: '+q.opts[q.ans] : 'Your answer: '+(answers[q.id] !== undefined ? q.opts[answers[q.id]] : 'Not answered')+' — Correct: '+q.opts[q.ans])+'</div>'+(!ok ? '<div class="rev-ans" style="color:#5a2020;margin-top:3px;font-style:italic">'+q.feedback+'</div>' : '')+'</div>';
         revWrap.appendChild(r);
       });
     }
   });
-
-  // Written response teacher-scoring section
-  const wsWrap = document.getElementById('written-scoring');
+  var wsWrap = document.getElementById('written-scoring');
   if(wsWrap){
     wsWrap.innerHTML = '';
-    WRITTEN_QS.forEach((wq, wqIdx) => {
-      const response = (writtenAnswers[wq.id] || '').trim();
-      const block = document.createElement('div');
+    WRITTEN_QS.forEach(function(wq, wqIdx){
+      var response = (writtenAnswers[wq.id] || '').trim();
+      var block = document.createElement('div');
       block.className = 'teacher-score-block';
-      block.innerHTML = `<h5>${wq.title} — out of ${wq.points} points</h5>
-        <p style="font-size:.82rem;color:var(--mid);margin-bottom:8px">Student response:</p>
-        <div class="student-response-box">${response || 'No response was submitted.'}</div>
-        <table class="rubric-table">
-          <thead><tr><th>Criterion</th><th>Points Available</th><th>Description</th><th>Score</th></tr></thead>
-          <tbody>${wq.rubric.map((r,ri) => `<tr>
-            <td>${r.criterion}</td>
-            <td><span class="pts-pill">${r.pts}</span></td>
-            <td>${r.desc}</td>
-            <td><input class="score-input" type="number" min="0" max="${r.pts}" placeholder="0-${r.pts}"
-              onchange="updateWrittenTotal(${wqIdx},${ri},this.value,${r.pts})"></td>
-          </tr>`).join('')}</tbody>
-        </table>
-        <div style="text-align:right;margin-top:10px;font-weight:700;font-size:.9rem;color:var(--navy)">
-          Subtotal: <span id="wq-sub-${wq.id}">0</span> / ${wq.points}
-        </div>`;
+      block.innerHTML = '<h5>'+wq.title+' — out of '+wq.points+' points</h5><p style="font-size:.82rem;color:var(--mid);margin-bottom:8px">Student response:</p><div class="student-response-box">'+(response || 'No response was submitted.')+'</div><table class="rubric-table"><thead><tr><th>Criterion</th><th>Points Available</th><th>Description</th><th>Score</th></tr></thead><tbody>'+wq.rubric.map(function(r,ri){ return '<tr><td>'+r.criterion+'</td><td><span class="pts-pill">'+r.pts+'</span></td><td>'+r.desc+'</td><td><input class="score-input" type="number" min="0" max="'+r.pts+'" placeholder="0-'+r.pts+'" onchange="updateWrittenTotal('+wqIdx+','+ri+',this.value,'+r.pts+')"></td></tr>'; }).join('')+'</tbody></table><div style="text-align:right;margin-top:10px;font-weight:700;font-size:.9rem;color:var(--navy)">Subtotal: <span id="wq-sub-'+wq.id+'">0</span> / '+wq.points+'</div>';
       wsWrap.appendChild(block);
     });
   }
-
-  // Build score breakdown text
-  let breakdown_txt = '';
-  Object.entries(domains).forEach(([d,v]) => { breakdown_txt += d + ': ' + v.correct + '/' + v.total + '\n'; });
-
-  // Auto-submit to Formspree (includes all written responses)
+  var breakdown_txt = '';
+  Object.entries(domains).forEach(function(entry){ breakdown_txt += entry[0]+': '+entry[1].correct+'/'+entry[1].total+'\n'; });
+  var fullReport = 'GRADE 4 OFFICIAL ASSESSMENT 1\nStudent: '+name+'\nTeacher: '+teacher+'\nDate: '+date+'\nMCQ Score: '+correct+'/'+total+' ('+pct+'%)\n\n'+breakdown_txt;
   sendToFormspree({
-    _subject:          '[Official] Grade 4 Language and Writing — ' + name + ' — ' + correct + '/' + total + ' (' + pct + '%)',
-    test_type:         'OFFICIAL TEST',
-    student_name:      name,
-    teacher:           teacher,
-    test_date:         date,
-    mcq_score:         correct + ' / ' + total + ' (' + pct + '%)',
-    score_breakdown:   breakdown_txt,
+    _subject: '[Official] Grade 4 Language and Writing — '+name+' — '+correct+'/'+total+' ('+pct+'%)',
+    test_type: 'OFFICIAL TEST',
+    student_name: name,
+    teacher: teacher,
+    test_date: date,
+    mcq_score: correct+' / '+total+' ('+pct+'%)',
+    score_breakdown: breakdown_txt,
     written_response_1: writtenAnswers['wq1'] || 'No response submitted',
     written_response_2: writtenAnswers['wq2'] || 'No response submitted',
-    written_response_3: writtenAnswers['wq3'] || 'No response submitted'
+    written_response_3: writtenAnswers['wq3'] || 'No response submitted',
+    full_report_part1: fullReport.substring(0, 5000),
+    full_report_part2: fullReport.length > 5000 ? fullReport.substring(5000, 10000) : '',
   });
-
   window.scrollTo(0, 0);
 }
-
-// ============================================================
-// DELIVERY
-// ============================================================
-
 </script>
-
-    </div>
-    <div class="fs-err" id="fs-err">Please paste a valid Formspree URL (it must start with https://formspree.io/f/)</div>
-    <div class="fs-modal-btns">
-      <button class="fs-btn-cancel" onclick="closeFsModal()">Cancel</button>
-      <button class="fs-btn-save" onclick="saveFsEndpoint()">Save</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
