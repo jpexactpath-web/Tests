@@ -215,35 +215,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
 .endpoint-warning strong{display:block;margin-bottom:4px}
 .endpoint-warning code{background:#fdecc8;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:.82rem}
 
-/* ── Formspree setup modal ── */
-.fs-modal-overlay{position:fixed;inset:0;background:rgba(15,39,68,.65);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
-.fs-modal-overlay.show{display:flex}
-.fs-modal{background:#fff;border-radius:20px;padding:36px 32px;max-width:480px;width:100%;box-shadow:0 16px 48px rgba(15,39,68,.22)}
-.fs-modal h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:#0f2744;margin-bottom:8px}
-.fs-modal .fs-sub{font-size:.84rem;color:#546e8a;margin-bottom:22px;line-height:1.7}
-.fs-modal .fs-sub a{color:#0e7c6e;font-weight:700;text-decoration:none}
-.fs-field{margin-bottom:16px}
-.fs-field label{display:block;font-size:.78rem;font-weight:700;color:#0f2744;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
-.fs-field input{width:100%;border:2px solid #d4dce8;border-radius:9px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:.95rem;color:#0f2744;outline:none;transition:border .2s}
-.fs-field input:focus{border-color:#0e7c6e}
-.fs-field .fs-hint{font-size:.74rem;color:#546e8a;margin-top:5px;line-height:1.5}
-.fs-modal-btns{display:flex;gap:10px;margin-top:20px}
-.fs-modal-btns button{flex:1;border:none;border-radius:10px;padding:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;transition:background .2s}
-.fs-btn-cancel{background:#edf2f8;color:#0f2744}
-.fs-btn-cancel:hover{background:#d4dce8}
-.fs-btn-save{background:#0e7c6e;color:white}
-.fs-btn-save:hover{background:#0a6358}
-.fs-err{display:none;background:#fdeaea;border-radius:8px;padding:10px 14px;font-size:.83rem;font-weight:600;color:#8c1c1c;margin-top:10px}
-/* ── Configured bar ── */
-.fs-configured-bar{display:none;align-items:center;justify-content:space-between;background:#e6f9ee;border:2px solid #a8dfc0;border-radius:10px;padding:12px 16px;margin-bottom:16px}
-.fs-configured-bar span{font-size:.85rem;font-weight:700;color:#1a5c35}
-.fs-configured-bar button{background:none;border:2px solid #1a5c35;border-radius:7px;padding:4px 12px;font-size:.78rem;font-weight:700;color:#1a5c35;cursor:pointer;font-family:'DM Sans',sans-serif}
-.fs-configured-bar button:hover{background:#1a5c35;color:white}
-/* ── Setup prompt ── */
-.fs-setup-prompt{background:#fff3cd;border:2px solid #f5d78e;border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:.85rem;color:#7a5500;line-height:1.6}
-.fs-setup-prompt strong{display:block;margin-bottom:6px}
-.fs-setup-btn{width:100%;background:#0f2744;color:white;border:none;border-radius:10px;padding:13px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;margin-bottom:0;transition:background .2s}
-.fs-setup-btn:hover{background:#1a4a8a}
 </style>
 </head>
 <body>
@@ -278,15 +249,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
       <label>Teacher</label>
       <input type="text" id="teacher-name" placeholder="Teacher name">
     </div>
-    <div class="fs-configured-bar" id="fs-configured-bar">
-      <span>Submission endpoint configured</span>
-      <button onclick="openFsModal()">Edit</button>
-    </div>
-    <div class="fs-setup-prompt" id="fs-setup-prompt">
-      <strong>Teacher: configure submission endpoint before sharing this test</strong>
-      Click the button below to paste your Formspree URL. This takes 30 seconds and only needs to be done once on this device.
-    </div>
-    <button class="fs-setup-btn" id="fs-setup-btn-cover" onclick="openFsModal()" style="margin-bottom:16px">Configure Submission Endpoint</button>
+
     <div class="rules-box">
       <h4>Official Test Rules</h4>
       <ul>
@@ -413,54 +376,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--navy);
 
 <script>
 // ============================================================
-// FORMSPREE — endpoint stored in browser (localStorage)
-// No file editing needed. Click "Configure" on the cover page.
+// FORMSPREE — endpoint hardcoded (no configuration needed)
 // ============================================================
-const FS_LS_KEY = 'fs_endpoint_grade4_lw_official';
-
-function getFsEndpoint(){{
-  return localStorage.getItem(FS_LS_KEY) || '';
-}}
-
-function openFsModal(){{
-  const current = getFsEndpoint();
-  document.getElementById('fs-url-input').value = current;
-  document.getElementById('fs-err').style.display = 'none';
-  document.getElementById('fs-modal-overlay').classList.add('show');
-}}
-
-function closeFsModal(){{
-  document.getElementById('fs-modal-overlay').classList.remove('show');
-}}
-
-function saveFsEndpoint(){{
-  const val = document.getElementById('fs-url-input').value.trim();
-  if(!val || !val.startsWith('https://formspree.io/f/')){
-    document.getElementById('fs-err').style.display = 'block';
-    return;
-  }
-  document.getElementById('fs-err').style.display = 'none';
-  localStorage.setItem(FS_LS_KEY, val);
-  applyFsUI(val);
-  closeFsModal();
-  const banner = document.getElementById('submit-banner');
-  if(banner){{ banner.textContent='Formspree configured. Results will be submitted automatically when the test ends.'; banner.style.background='#e6f9ee'; banner.style.color='#1a5c35'; banner.style.borderColor='#a8dfc0'; }}
-}}
-
-function applyFsUI(endpoint){{
-  const hasEndpoint = endpoint && endpoint.startsWith('https://formspree.io/f/');
-  const prompt = document.getElementById('fs-setup-prompt');
-  const bar    = document.getElementById('fs-configured-bar');
-  if(prompt) prompt.style.display = hasEndpoint ? 'none'  : 'block';
-  if(bar)    bar.style.display    = hasEndpoint ? 'flex'  : 'none';
-}}
-
-// Apply on page load
-(function(){{
-  const ep = getFsEndpoint();
-  document.addEventListener('DOMContentLoaded', () => applyFsUI(ep));
-  if(document.readyState !== 'loading') applyFsUI(ep);
-}})();
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mdapkdel';
+function getFsEndpoint(){ return FORMSPREE_ENDPOINT; }
 
 // ============================================================
 // QUESTION DATA
@@ -998,14 +917,6 @@ async function sendToFormspree(scoreData){
   const bannerEl = document.getElementById('submit-banner');
   const endpoint = getFsEndpoint();
 
-  if(!endpoint){
-    if(bannerEl){
-      bannerEl.innerHTML = 'Formspree not configured. Ask your teacher to open the test and click <strong>Configure Submission Endpoint</strong>.';
-      bannerEl.style.background='#fff3cd'; bannerEl.style.color='#7a5500'; bannerEl.style.borderColor='#f5d78e';
-    }
-    return;
-  }
-
   if(bannerEl){ bannerEl.textContent='Submitting results — please wait...'; bannerEl.style.background='#edf2f8'; bannerEl.style.color='#546e8a'; bannerEl.style.borderColor='#d4dce8'; }
 
   function safe(str){ return (str||'No response submitted.').substring(0,3000); }
@@ -1254,24 +1165,6 @@ function submitTest(){
 
 </script>
 
-<!-- Formspree setup modal -->
-<div class="fs-modal-overlay" id="fs-modal-overlay">
-  <div class="fs-modal">
-    <h3>Configure Submission Endpoint</h3>
-    <p class="fs-sub">
-      Paste your <a href="https://formspree.io" target="_blank">Formspree</a> form URL below.
-      This is saved in your browser — you only need to do this once per device.<br><br>
-      Your Formspree URL looks like:<br>
-      <strong>https://formspree.io/f/xxxxxxxx</strong>
-    </p>
-    <div class="fs-field">
-      <label>Formspree Form URL</label>
-      <input type="url" id="fs-url-input" placeholder="https://formspree.io/f/xxxxxxxx" autocomplete="off" spellcheck="false">
-      <div class="fs-hint">
-        1. Go to <strong>formspree.io</strong> and sign in<br>
-        2. Open your form and copy the URL shown on the form page<br>
-        3. Paste it above and click Save
-      </div>
     </div>
     <div class="fs-err" id="fs-err">Please paste a valid Formspree URL (it must start with https://formspree.io/f/)</div>
     <div class="fs-modal-btns">
